@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { useProfile, calculateLevel } from "@/hooks/use-portfolio-data";
+import { playButtonSound } from "@/lib/audio";
 
 // Navigation component for the RPG-style portfolio
 
@@ -54,6 +55,7 @@ export function Navigation() {
             return (
               <Link key={item.path} href={item.path}>
                 <button 
+                  onClick={playButtonSound}
                   className={cn(
                     "font-display text-[8px] sm:text-[10px] px-3 sm:px-4 py-2 uppercase border-2 transition-all active:translate-y-1",
                     isActive 

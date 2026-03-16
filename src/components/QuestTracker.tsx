@@ -2,6 +2,7 @@ import { CheckSquare, CircleDashed, Circle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAchievements } from "@/hooks/use-achievements";
+import { playButtonSound } from "@/lib/audio";
 
 const INITIAL_QUESTS = [
   { id: 1, text: "Build React App", completed: true },
@@ -36,7 +37,10 @@ export function QuestTracker() {
     <div className="fixed top-24 right-4 z-40 hidden md:block w-64">
       <div 
         className="pixel-panel p-0 bg-opacity-90 backdrop-blur-sm cursor-pointer hover:border-primary transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          playButtonSound();
+        }}
       >
         <div className="bg-primary p-2 border-b-4 border-white flex justify-between items-center">
           <span className="font-display text-[10px] text-primary-foreground text-shadow-pixel uppercase">ACTIVE QUESTS</span>

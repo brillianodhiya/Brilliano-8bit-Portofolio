@@ -48,11 +48,17 @@ export function FloatingCoins() {
   const collect = useCallback((coin: Coin) => {
     const pts = SCORES[coin.type];
     addScore(pts);
+    
+    // Play collect sound
+    const audio = new Audio(`${import.meta.env.BASE_URL}collect-coin.mp3`);
+    audio.volume = 0.4;
+    audio.play().catch(() => {});
+
     const popup = { id: Date.now(), x: coin.x, y: coin.y, val: pts };
     setPopups(prev => [...prev, popup]);
     setTimeout(() => setPopups(prev => prev.filter(p => p.id !== popup.id)), 1200);
     setTimeout(() => setCoins(prev => prev.filter(c => c.id !== coin.id)), 400);
-  }, [score]);
+  }, [score, addScore]);
 
   return (
     <>

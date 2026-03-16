@@ -6,6 +6,7 @@ import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
 import { useProfile, usePortfolioData, calculateLevel } from "@/hooks/use-portfolio-data";
 import { cn } from "@/lib/utils";
+import { playButtonSound } from "@/lib/audio";
 
 export default function Home() {
   const { unlockAchievement } = useAchievements();
@@ -30,13 +31,15 @@ export default function Home() {
   }, []);
 
   const handleDownload = () => {
+    playButtonSound();
     unlockAchievement("cv_download");
     window.open("https://drive.google.com/file/d/1bXnsBuyn_voV-xzwK4ts-9uA89QFzFF2/view?usp=sharing", "_blank");
   };
 
-  const playSound = (type: 'coin' | 'playful') => {
-    const audio = new Audio(`${import.meta.env.BASE_URL}${type === 'coin' ? '8-bit-coin.mp3' : 'playful.mp3'}`);
-    audio.volume = 0.3;
+  const playSound = (type: 'coin' | 'playful' | 'boss') => {
+    const file = type === 'coin' ? '8-bit-coin.mp3' : type === 'playful' ? 'playful.mp3' : 'boss-attack.mp3';
+    const audio = new Audio(`${import.meta.env.BASE_URL}${file}`);
+    audio.volume = type === 'boss' ? 0.5 : 0.3;
     audio.play().catch(() => {}); // Browser might block auto-play
   };
 
@@ -99,7 +102,10 @@ export default function Home() {
               onClick={() => {
                 const next = !isAlternate;
                 setIsAlternate(next);
-                if (next) unlockAchievement("hidden_persona");
+                if (next) {
+                  unlockAchievement("hidden_persona");
+                  playSound('boss');
+                }
               }}
               className="w-32 h-32 md:w-48 md:h-48 border-4 border-white relative bg-muted animate-float cursor-pointer group hover:border-primary transition-colors overflow-hidden"
             >
@@ -176,19 +182,31 @@ export default function Home() {
 
         {/* Quick Tools */}
         <div className="pixel-panel p-4 grid grid-cols-4 gap-2">
-          <div className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer">
+          <div 
+            onClick={playButtonSound}
+            className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer"
+          >
             <Terminal size={20} className="text-primary" />
             <span className="font-display text-[8px]">CMD</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer">
+          <div 
+            onClick={playButtonSound}
+            className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer"
+          >
             <Code2 size={20} className="text-secondary" />
             <span className="font-display text-[8px]">CODE</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer">
+          <div 
+            onClick={playButtonSound}
+            className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer"
+          >
             <Cpu size={20} className="text-accent" />
             <span className="font-display text-[8px]">SYS</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer">
+          <div 
+            onClick={playButtonSound}
+            className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer"
+          >
             <Coffee size={20} className="text-destructive" />
             <span className="font-display text-[8px]">FUEL</span>
           </div>

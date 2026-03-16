@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
+import { playButtonSound } from "@/lib/audio";
 
 export default function Gallery() {
   const { data: imagesData, isLoading } = usePortfolioData('gallery');
@@ -32,6 +33,7 @@ export default function Gallery() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.2 }}
+            onClick={playButtonSound}
             className="pixel-panel p-2 md:p-4 bg-background group cursor-pointer"
           >
             <div className="border-4 border-muted overflow-hidden relative aspect-video">

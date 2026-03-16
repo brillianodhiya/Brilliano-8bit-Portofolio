@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScore } from "@/hooks/use-score";
 import { supabase } from "@/lib/supabaseClient";
+import { playButtonSound } from "@/lib/audio";
 
 const UNLOCK_SCORE = 10000;
 const SKINS = [
@@ -119,7 +120,12 @@ export function AvatarSetup() {
     <>
       <div className="fixed bottom-24 left-4 z-40">
         <button
-          onClick={() => !isLocked && setIsOpen(true)}
+          onClick={() => {
+            if (!isLocked) {
+              setIsOpen(true);
+              playButtonSound();
+            }
+          }}
           disabled={isLocked && !hasSaved}
           className={`pixel-btn px-4 py-2 text-[10px] sm:text-xs min-w-[120px] ${
             isLocked ? "bg-gray-500 opacity-60 cursor-not-allowed" : "bg-accent text-accent-foreground"
@@ -158,7 +164,10 @@ export function AvatarSetup() {
                     {SKINS.map((skin) => (
                       <button
                         key={skin.id}
-                        onClick={() => setSelectedSkin(skin.id)}
+                        onClick={() => {
+                          setSelectedSkin(skin.id);
+                          playButtonSound();
+                        }}
                         className={`p-2 border-4 flex items-center justify-center min-w-[70px] min-h-[70px] transition-all ${
                           selectedSkin === skin.id ? "border-primary bg-primary/20 scale-110" : "border-white/20 bg-background hover:border-white"
                         }`}
@@ -181,7 +190,10 @@ export function AvatarSetup() {
 
                 <div className="flex flex-wrap gap-2 pt-4">
                   <button
-                    onClick={handleSave}
+                    onClick={() => {
+                      handleSave();
+                      playButtonSound();
+                    }}
                     disabled={isSaving || !name}
                     className="pixel-btn flex-1 py-3 disabled:opacity-50 min-w-[140px]"
                   >
@@ -190,7 +202,10 @@ export function AvatarSetup() {
                   
                   {hasSaved && (
                     <button
-                      onClick={handleLeave}
+                      onClick={() => {
+                        handleLeave();
+                        playButtonSound();
+                      }}
                       disabled={isSaving}
                       className="pixel-btn pixel-btn-destructive flex-1 py-3 disabled:opacity-50 min-w-[140px]"
                     >
@@ -199,7 +214,10 @@ export function AvatarSetup() {
                   )}
                   
                   <button
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => {
+                      setIsOpen(false);
+                      playButtonSound();
+                    }}
                     className="pixel-btn bg-background text-foreground border-white/40 px-6"
                   >
                     X

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Award, Star, Shield, Zap, Loader2 } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
+import { playButtonSound } from "@/lib/audio";
 
 const ICON_MAP: Record<string, any> = {
   Award, Star, Shield, Zap
@@ -61,7 +62,8 @@ export default function Certifications() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.15 }}
               whileHover={{ y: -4 }}
-              className="pixel-panel p-0 flex overflow-hidden group"
+              onClick={playButtonSound}
+              className="pixel-panel p-0 flex overflow-hidden group cursor-pointer"
             >
               <div className={`w-24 md:w-32 flex items-center justify-center border-r-4 border-white ${award.bg} relative overflow-hidden`}>
                 <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%)] bg-[length:250%_250%,100%_100%] animate-[shine_3s_infinite]" />

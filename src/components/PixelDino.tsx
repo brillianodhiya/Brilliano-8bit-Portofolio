@@ -62,6 +62,11 @@ export function PixelDino() {
       state.current.jumping = true;
       state.current.vy = JUMP_VEL;
       setIsJumping(true);
+
+      // Play jump sound
+      const audio = new Audio(`${import.meta.env.BASE_URL}jump.mp3`);
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
     }
     unlockAchievement("dino_click");
     const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];

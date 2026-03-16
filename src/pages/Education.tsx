@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { BookOpen, GraduationCap, MapPin, Loader2 } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
+import { playButtonSound } from "@/lib/audio";
 
 export default function Education() {
   const { data: educationData, isLoading } = usePortfolioData('education');
@@ -45,7 +46,8 @@ export default function Education() {
                 initial={{ opacity: 0, x: isEven ? -50 : 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.2 }}
-                className={`flex flex-col md:flex-row items-center gap-6 ${isEven ? 'md:flex-row-reverse' : ''}`}
+                onClick={playButtonSound}
+                className={`flex flex-col md:flex-row items-center gap-6 cursor-pointer ${isEven ? 'md:flex-row-reverse' : ''}`}
               >
                 {/* Content */}
                 <div className={`w-full md:w-1/2 pixel-panel p-5 bg-background ${item.border}`}>

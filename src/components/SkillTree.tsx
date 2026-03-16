@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
+import { playButtonSound } from "@/lib/audio";
 
 interface Skill {
   id: string;
@@ -67,7 +68,10 @@ export function SkillTree() {
       {/* Category filter */}
       <div className="flex flex-wrap gap-2 justify-center">
         <button
-          onClick={() => setActiveCategory("all")}
+          onClick={() => {
+            setActiveCategory("all");
+            playButtonSound();
+          }}
           className={`font-display text-[8px] px-3 py-2 border-2 transition-all ${activeCategory === "all" ? "bg-primary border-white text-primary-foreground" : "bg-card border-muted text-muted-foreground hover:border-white"}`}
         >
           ALL
@@ -75,7 +79,10 @@ export function SkillTree() {
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
+            onClick={() => {
+              setActiveCategory(cat.id);
+              playButtonSound();
+            }}
             className={`font-display text-[8px] px-3 py-2 border-2 transition-all ${activeCategory === cat.id ? `${cat.color} border-white` : "bg-card border-muted text-muted-foreground hover:border-white"}`}
           >
             {cat.label.split(" ")[0]}
@@ -93,7 +100,10 @@ export function SkillTree() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.05 }}
-              onClick={() => setSelected(skill)}
+              onClick={() => {
+                setSelected(skill);
+                playButtonSound();
+              }}
               className={`pixel-panel p-3 flex flex-col items-center gap-2 cursor-pointer hover:-translate-y-1 transition-transform ${!skill.unlocked ? "opacity-50 grayscale" : ""}`}
               style={{ borderColor: skill.unlocked ? undefined : "#555" }}
             >
@@ -167,7 +177,10 @@ export function SkillTree() {
               )}
 
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => {
+                  setSelected(null);
+                  playButtonSound();
+                }}
                 className="mt-4 w-full pixel-btn py-2"
               >
                 CLOSE

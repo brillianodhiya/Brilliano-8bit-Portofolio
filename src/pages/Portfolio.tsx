@@ -4,6 +4,7 @@ import { X, ExternalLink, Github } from "lucide-react";
 
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
+import { playButtonSound } from "@/lib/audio";
 
 export default function Portfolio() {
   const { data: projectsData, isLoading } = usePortfolioData('projects');
@@ -49,7 +50,10 @@ export default function Portfolio() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
-            onClick={() => setSelected(proj)}
+            onClick={() => {
+              setSelected(proj);
+              playButtonSound();
+            }}
             className={`pixel-panel p-4 cursor-pointer hover:-translate-y-2 transition-transform duration-200 group flex flex-col items-center text-center`}
           >
             <div className={`w-32 h-32 bg-background border-4 ${proj.color} mb-4 flex items-center justify-center overflow-hidden relative`}>
@@ -85,7 +89,10 @@ export default function Portfolio() {
               className={`pixel-panel max-w-2xl w-full p-0 flex flex-col md:flex-row relative ${selected.color}`}
             >
               <button 
-                onClick={() => setSelected(null)}
+                onClick={() => {
+                  setSelected(null);
+                  playButtonSound();
+                }}
                 className="absolute -top-4 -right-4 w-10 h-10 pixel-btn bg-destructive flex items-center justify-center z-10"
               >
                 <X size={20} />
@@ -122,10 +129,16 @@ export default function Portfolio() {
                 </div>
 
                 <div className="flex gap-4 mt-auto">
-                  <button className="pixel-btn bg-primary py-3 px-4 flex-1 flex justify-center items-center gap-2">
+                  <button 
+                    onClick={playButtonSound}
+                    className="pixel-btn bg-primary py-3 px-4 flex-1 flex justify-center items-center gap-2"
+                  >
                     <ExternalLink size={16} /> LIVE DEMO
                   </button>
-                  <button className="pixel-btn bg-card py-3 px-4 flex-1 flex justify-center items-center gap-2">
+                  <button 
+                    onClick={playButtonSound}
+                    className="pixel-btn bg-card py-3 px-4 flex-1 flex justify-center items-center gap-2"
+                  >
                     <Github size={16} /> SOURCE
                   </button>
                 </div>

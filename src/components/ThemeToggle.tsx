@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { playButtonSound } from "@/lib/audio";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(true);
@@ -22,6 +23,7 @@ export function ThemeToggle() {
   }
 
   const toggle = () => {
+    playButtonSound();
     const next = !isDark;
     setIsDark(next);
     localStorage.setItem("portfolio_theme", next ? "dark" : "light");

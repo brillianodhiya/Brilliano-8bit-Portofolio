@@ -65,6 +65,11 @@ export const unlockAchievement = (id: string) => {
     ach.unlocked = true;
     recentUnlock = ach;
     notify();
+
+    // Play achievement sound
+    const audio = new Audio(`${import.meta.env.BASE_URL}achievement.mp3`);
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
     
     // Track this player globally if not already tracked
     trackAchievementPlayer();
