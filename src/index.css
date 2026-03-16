@@ -163,6 +163,13 @@
     animation: flicker 0.15s infinite;
   }
 
+  .pixel-img-frame {
+    @apply border-4 border-white bg-black relative p-1;
+    box-shadow: 
+      inset -4px -4px 0px 0px rgba(255,255,255,0.3),
+      4px 4px 0px 0px rgba(0,0,0,1);
+  }
+
   .pixelated {
     image-rendering: pixelated;
     image-rendering: crisp-edges;

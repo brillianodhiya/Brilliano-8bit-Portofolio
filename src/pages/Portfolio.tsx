@@ -1,23 +1,54 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { X, ExternalLink, Github } from "lucide-react";
+import { X, ExternalLink, Github, Shield, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
 
+const PROJECT_COLORS = [
+  "border-primary",
+  "border-secondary",
+  "border-accent",
+  "border-destructive",
+  "border-blue-400",
+  "border-purple-400",
+  "border-pink-400"
+];
+
 export default function Portfolio() {
   const { data: projectsData, isLoading } = usePortfolioData('projects');
   
-  const PROJECTS = (projectsData || []).map((p: any) => ({
+  const PROJECTS = (projectsData || []).map((p: any, idx: number) => ({
     ...p,
     desc: p.description,
     type: p.type || "Quest",
-    color: p.color || "border-primary",
-    image: p.image || "cartridge-1.png"
+    color: p.color || PROJECT_COLORS[idx % PROJECT_COLORS.length],
+    images: p.images || ["cartridge-1.png"],
+    demoUrl: p.demo_url,
+    githubUrl: p.github_url
   }));
 
   const [selected, setSelected] = useState<any | null>(null);
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
+
+  const nextImage = () => {
+    if (!selected) return;
+    playButtonSound();
+    setCurrentImageIdx((prev) => (prev + 1) % selected.images.length);
+  };
+
+  const prevImage = () => {
+    if (!selected) return;
+    playButtonSound();
+    setCurrentImageIdx((prev) => (prev - 1 + selected.images.length) % selected.images.length);
+  };
+
+  const getImageUrl = (image: string) => {
+    if (image.startsWith('http')) return image;
+    return `${import.meta.env.BASE_URL}images/${image}`;
+  };
 
   if (isLoading) {
     return (
@@ -52,17 +83,20 @@ export default function Portfolio() {
             transition={{ delay: idx * 0.1 }}
             onClick={() => {
               setSelected(proj);
+              setCurrentImageIdx(0);
               playButtonSound();
             }}
             className={`pixel-panel p-4 cursor-pointer hover:-translate-y-2 transition-transform duration-200 group flex flex-col items-center text-center`}
           >
-            <div className={`w-32 h-32 bg-background border-4 ${proj.color} mb-4 flex items-center justify-center overflow-hidden relative`}>
-               <img 
-                 src={`${import.meta.env.BASE_URL}images/${proj.image}`} 
-                 alt={proj.title}
-                 className="w-24 h-24 object-contain group-hover:scale-110 transition-transform rendering-pixelated"
-               />
-               <div className="absolute bottom-0 w-full bg-black/80 font-display text-[8px] py-1 text-white">
+            <div className={`w-32 h-32 bg-background border-4 ${proj.color} mb-4 flex items-center justify-center overflow-hidden relative p-2`}>
+               <div className="pixel-img-frame w-full h-full">
+                 <img 
+                   src={getImageUrl(proj.images[0])} 
+                   alt={proj.title}
+                   className="w-full h-full object-cover group-hover:scale-110 transition-transform rendering-pixelated"
+                 />
+               </div>
+               <div className="absolute bottom-0 w-full bg-black/80 font-display text-[8px] py-1 text-white z-10">
                  PRESS A
                </div>
             </div>
@@ -98,13 +132,56 @@ export default function Portfolio() {
                 <X size={20} />
               </button>
 
-              <div className="w-full md:w-2/5 bg-background p-6 flex flex-col items-center justify-center border-b-4 md:border-b-0 md:border-r-4 border-white">
-                 <img 
-                   src={`${import.meta.env.BASE_URL}images/${selected.image}`} 
-                   alt={selected.title}
-                   className="w-32 h-32 md:w-48 md:h-48 object-contain rendering-pixelated mb-4 animate-float"
-                 />
-                 <div className="font-display text-[10px] text-center text-primary px-3 py-1 border-2 border-primary bg-primary/10">
+              <div className="w-full md:w-2/5 bg-background p-6 flex flex-col items-center justify-center border-b-4 md:border-b-0 md:border-r-4 border-white relative group/modal min-h-[300px]">
+                 {/* Carousel Controls */}
+                 {selected.images.length > 1 && (
+                   <>
+                     <button 
+                       onClick={prevImage}
+                       className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                     >
+                       <ChevronLeft size={16} />
+                     </button>
+                     <button 
+                       onClick={nextImage}
+                       className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                     >
+                       <ChevronRight size={16} />
+                     </button>
+                     <div className="absolute top-2 left-2 font-display text-[8px] text-primary bg-background/80 px-2 py-1 border border-primary z-20">
+                       {currentImageIdx + 1}/{selected.images.length}
+                     </div>
+                   </>
+                 )}
+
+                 <div 
+                   className="relative cursor-zoom-in group/img"
+                   onClick={() => {
+                     playButtonSound();
+                     window.open(getImageUrl(selected.images[currentImageIdx]), "_blank");
+                   }}
+                 >
+                   <AnimatePresence mode="wait">
+                     <motion.div
+                       key={currentImageIdx}
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 1.05 }}
+                       className="pixel-img-frame w-full max-h-[250px] md:max-h-[350px] overflow-hidden"
+                     >
+                       <img 
+                         src={getImageUrl(selected.images[currentImageIdx])} 
+                         alt={selected.title}
+                         className="w-full h-full object-contain rendering-pixelated animate-float"
+                       />
+                     </motion.div>
+                   </AnimatePresence>
+                   <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                      <ExternalLink size={24} className="text-white drop-shadow-md" />
+                   </div>
+                 </div>
+
+                 <div className="font-display text-[10px] text-center text-primary px-3 py-1 border-2 border-primary bg-primary/10 mt-auto">
                    STATUS: {selected.status}
                  </div>
               </div>
@@ -128,19 +205,45 @@ export default function Portfolio() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 mt-auto">
-                  <button 
-                    onClick={playButtonSound}
-                    className="pixel-btn bg-primary py-3 px-4 flex-1 flex justify-center items-center gap-2"
-                  >
-                    <ExternalLink size={16} /> LIVE DEMO
-                  </button>
-                  <button 
-                    onClick={playButtonSound}
-                    className="pixel-btn bg-card py-3 px-4 flex-1 flex justify-center items-center gap-2"
-                  >
-                    <Github size={16} /> SOURCE
-                  </button>
+                <div className="flex flex-col gap-4 mt-auto">
+                  {(!selected.demoUrl?.trim() && !selected.githubUrl?.trim()) ? (
+                    <div className="pixel-panel bg-destructive/10 border-destructive p-4 flex flex-col items-center gap-2">
+                       <Shield size={24} className="text-destructive animate-pulse" />
+                       <span className="font-display text-[10px] text-destructive">CONFIDENTIAL SOURCE</span>
+                       <p className="font-body text-sm text-center text-muted-foreground">
+                         This is a private company application. Source code and live demo are restricted due to NDA/Confidentiality.
+                       </p>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4">
+                      <button 
+                        onClick={() => {
+                          playButtonSound();
+                          if (selected.demoUrl?.trim()) window.open(selected.demoUrl, "_blank");
+                        }}
+                        className={cn(
+                          "pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2",
+                          selected.demoUrl?.trim() ? "bg-primary" : "bg-gray-700 opacity-50 cursor-not-allowed"
+                        )}
+                        disabled={!selected.demoUrl?.trim()}
+                      >
+                        <ExternalLink size={16} /> LIVE DEMO
+                      </button>
+                      <button 
+                        onClick={() => {
+                          playButtonSound();
+                          if (selected.githubUrl?.trim()) window.open(selected.githubUrl, "_blank");
+                        }}
+                        className={cn(
+                          "pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2",
+                          selected.githubUrl?.trim() ? "bg-card" : "bg-gray-700 opacity-50 cursor-not-allowed"
+                        )}
+                        disabled={!selected.githubUrl?.trim()}
+                      >
+                        <Github size={16} /> SOURCE
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
