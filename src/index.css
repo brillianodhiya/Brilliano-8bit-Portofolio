@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: 'Press Start 2P', cursive;
+  --font-body: 'VT323', monospace;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-border: hsl(var(--border));
+}
+
+:root {
+  /* Dark Navy */
+  --background: 240 64% 11%;
+  /* Light blueish white */
+  --foreground: 240 30% 95%;
+  
+  /* Cyan / Teal */
+  --primary: 190 100% 50%;
+  --primary-foreground: 240 64% 11%;
+  
+  /* Sandy Yellow */
+  --secondary: 51 100% 50%;
+  --secondary-foreground: 240 64% 11%;
+  
+  /* Mint Green */
+  --accent: 120 73% 75%;
+  --accent-foreground: 240 64% 11%;
+  
+  /* Coral / Orange */
+  --destructive: 16 100% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* Deep Purple for cards */
+  --card: 267 43% 24%;
+  --card-foreground: 240 30% 95%;
+  
+  --muted: 240 40% 20%;
+  --muted-foreground: 240 30% 70%;
+  
+  --border: 0 0% 100%;
+}
+
+/* LIGHT MODE override */
+.light {
+  --background: 55 100% 95%;
+  --foreground: 240 64% 11%;
+  --primary: 190 80% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 45 90% 45%;
+  --secondary-foreground: 240 64% 11%;
+  --accent: 120 60% 40%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 16 90% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --card: 50 80% 90%;
+  --card-foreground: 240 64% 11%;
+  --muted: 55 60% 85%;
+  --muted-foreground: 240 30% 40%;
+  --border: 240 64% 11%;
+}
+
+.light body {
+  background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.06) 1px, transparent 1px);
+}
+
+.light .pixel-panel {
+  box-shadow:
+    inset -4px -4px 0px 0px rgba(0,0,0,0.2),
+    inset 4px 4px 0px 0px rgba(255,255,255,0.5),
+    8px 8px 0px 0px rgba(0,0,0,0.3);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased font-body;
+    background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    cursor: crosshair;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply leading-tight;
+  }
+}
+
+@layer utilities {
+  .pixel-panel {
+    @apply bg-card text-card-foreground border-4 border-white;
+    box-shadow: 
+      inset -4px -4px 0px 0px rgba(0,0,0,0.5),
+      inset 4px 4px 0px 0px rgba(255,255,255,0.2),
+      8px 8px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .pixel-btn {
+    @apply relative bg-primary text-primary-foreground font-display text-xs border-4 border-white uppercase select-none active:translate-y-1 active:translate-x-1 transition-all;
+    box-shadow: 
+      inset -4px -4px 0px 0px rgba(0,0,0,0.3),
+      inset 4px 4px 0px 0px rgba(255,255,255,0.4),
+      6px 6px 0px 0px rgba(0,0,0,0.6);
+  }
+  
+  .pixel-btn:active {
+    box-shadow: 
+      inset 4px 4px 0px 0px rgba(0,0,0,0.3),
+      inset -4px -4px 0px 0px rgba(255,255,255,0.2),
+      0px 0px 0px 0px rgba(0,0,0,0.6);
+  }
+
+  .pixel-btn-secondary {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  .pixel-btn-accent {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .pixel-btn-destructive {
+    @apply bg-destructive text-destructive-foreground;
+  }
+
+  .text-shadow-pixel {
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+  }
+
+  .text-shadow-pixel-primary {
+    text-shadow: 2px 2px 0px hsl(var(--primary)), 4px 4px 0px rgba(0,0,0,0.8);
+  }
+  
+  .pixel-corners {
+    clip-path: polygon(
+      0px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px 100%,
+      calc(100% - 4px) 100%,
+      calc(100% - 4px) calc(100% - 4px),
+      100% calc(100% - 4px),
+      100% 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 0px,
+      4px 0px,
+      4px 4px,
+      0px 4px
+    );
+  }
+
+  .crt-flicker {
+    animation: flicker 0.15s infinite;
+  }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.95; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 16px;
+  background: hsl(var(--background));
+  border-left: 4px solid #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border: 4px solid #fff;
+  box-shadow: inset -2px -2px 0px rgba(0,0,0,0.3), inset 2px 2px 0px rgba(255,255,255,0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--secondary));
+}
