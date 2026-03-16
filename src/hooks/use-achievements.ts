@@ -1,4 +1,3 @@
-import { create } from "zustand";
 
 interface Achievement {
   id: string;
@@ -7,18 +6,15 @@ interface Achievement {
   unlocked: boolean;
 }
 
-interface AchievementStore {
-  achievements: Achievement[];
-  unlockAchievement: (id: string) => void;
-  recentUnlock: Achievement | null;
-  clearRecent: () => void;
-}
-
 const INITIAL_ACHIEVEMENTS: Achievement[] = [
   { id: "first_blood", title: "Press Start", description: "Entered the portfolio.", unlocked: false },
   { id: "explorer", title: "Explorer", description: "Visited all main pages.", unlocked: false },
   { id: "music_lover", title: "DJ Pixel", description: "Played the background music.", unlocked: false },
   { id: "cv_download", title: "Loot Acquired", description: "Downloaded the CV.", unlocked: false },
+  { id: "hidden_persona", title: "The Hidden Boss", description: "You found the Kanrishaurus persona!", unlocked: false },
+  { id: "legendary_hero", title: "Legendary Hero", description: "Accepted the quest to build a legendary realm.", unlocked: false },
+  { id: "reluctant_hero", title: "The Reluctant Hero", description: "Attempted to escape destiny. (Failure)", unlocked: false },
+  { id: "destiny_unavoidable", title: "Destiny Unavoidable", description: "Witnessed the critical dialogue error.", unlocked: false },
 ];
 
 // We use a simple Zustand store (simulated with React state + Context in standard apps, but here we just use a basic observer pattern if Zustand isn't available. Wait, I didn't add zustand to requirements. I will implement a lightweight custom pub/sub or just use React Context if needed, but I'll write a simple custom hook using global state for ease).

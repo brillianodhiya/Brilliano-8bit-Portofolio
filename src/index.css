@@ -205,3 +205,12 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--secondary));
 }
+
+/* Red Theme for Kanrishaurus mode */
+.theme-red {
+  --primary: 0 100% 50%; /* Pure Red */
+  --secondary: 0 100% 30%; /* Dark Red/Maroon */
+  --accent: 0 100% 70%; /* Light Red/Pinkish */
+  --card: 345 40% 15%; /* Deep Red-Black */
+  --primary-foreground: 0 0% 100%;
+}

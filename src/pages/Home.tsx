@@ -1,15 +1,17 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Download, Terminal, Coffee, Code2, Cpu, Loader2 } from "lucide-react";
 import { CommitGraph } from "@/components/CommitGraph";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
 import { useProfile, usePortfolioData, calculateLevel } from "@/hooks/use-portfolio-data";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { unlockAchievement } = useAchievements();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = usePortfolioData('attributes');
+  const [isAlternate, setIsAlternate] = useState(false);
   
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
@@ -17,8 +19,10 @@ export default function Home() {
   // RPG Dialogue Logic
   const [accepted, setAccepted] = useState(false);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
+  const [dialogueGlitched, setDialogueGlitched] = useState(false);
   const DIALOGUE_BASE = "🏰 Quest: New Hero Summoned! Brilliano has spawned in your party. Accept mission to build legendary realm?";
-  const { displayedText, isComplete } = useTypingEffect(DIALOGUE_BASE, 30);
+  const DIALOGUE_GLITCH = "⚠️ ERROR: Critical failure in escaping. Re-summoning heroes... Destiny is unavoidable.";
+  const { displayedText, isComplete } = useTypingEffect(dialogueGlitched ? DIALOGUE_GLITCH : DIALOGUE_BASE, 30);
 
   useEffect(() => {
     // Just to ensure achievements listener is primed
@@ -27,8 +31,7 @@ export default function Home() {
 
   const handleDownload = () => {
     unlockAchievement("cv_download");
-    // Mock download
-    alert("Downloading CV.pdf... (Mock)");
+    window.open("https://drive.google.com/file/d/1bXnsBuyn_voV-xzwK4ts-9uA89QFzFF2/view?usp=sharing", "_blank");
   };
 
   const playSound = (type: 'coin' | 'playful') => {
@@ -43,6 +46,17 @@ export default function Home() {
     const randomX = (Math.random() - 0.5) * 200;
     const randomY = (Math.random() - 0.5) * 100;
     setNoPos({ x: randomX, y: randomY });
+  };
+
+  const handleNo = () => {
+    setDialogueGlitched(true);
+    unlockAchievement("reluctant_hero");
+    unlockAchievement("destiny_unavoidable");
+    // Pulse the screen or something? The red glitch text might be enough or we can add a class
+    setTimeout(() => {
+      setDialogueGlitched(false);
+      setNoPos({ x: 0, y: 0 });
+    }, 4000);
   };
 
   const handleYes = () => {
@@ -73,23 +87,41 @@ export default function Home() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full flex flex-col lg:flex-row gap-8"
+      className={cn("w-full flex flex-col lg:flex-row gap-8 transition-colors duration-500", isAlternate && "theme-red")}
     >
       {/* Left Column: Character Profile */}
       <div className="w-full lg:w-1/3 flex flex-col gap-6">
         <div className="pixel-panel p-6 flex flex-col items-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-secondary" />
           
-          <div className="w-32 h-32 md:w-48 md:h-48 border-4 border-white mb-6 relative bg-muted animate-float">
-            <img 
-              src={profile?.avatar_url 
-                ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${import.meta.env.BASE_URL}${profile.avatar_url}`) 
-                : `${import.meta.env.BASE_URL}images/pixel-avatar.png`} 
-              alt={`${profile?.name || 'Brilliano'} Avatar`} 
-              className="w-full h-full object-cover rendering-pixelated"
-            />
-            <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground border-2 border-white px-2 py-1 font-display text-[10px]">
-              LVL.{level}
+          <div className="relative mb-6">
+            <div 
+              onClick={() => {
+                const next = !isAlternate;
+                setIsAlternate(next);
+                if (next) unlockAchievement("hidden_persona");
+              }}
+              className="w-32 h-32 md:w-48 md:h-48 border-4 border-white relative bg-muted animate-float cursor-pointer group hover:border-primary transition-colors overflow-hidden"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img 
+                  key={isAlternate ? 'alt' : 'normal'}
+                  initial={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
+                  animate={{ filter: 'brightness(1) grayscale(0)', opacity: 1 }}
+                  exit={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
+                  src={isAlternate 
+                    ? `${import.meta.env.BASE_URL}me-alternate2.png`
+                    : (profile?.avatar_url 
+                      ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${import.meta.env.BASE_URL}${profile.avatar_url}`) 
+                      : `${import.meta.env.BASE_URL}images/pixel-avatar.png`)} 
+                  alt={isAlternate ? "Kanrishaurus" : (profile?.name || 'Brilliano')} 
+                  className="w-full h-full object-cover rendering-pixelated"
+                />
+              </AnimatePresence>
+              <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground border-2 border-white px-2 py-1 font-display text-[10px] z-10">
+              LVL.{isAlternate ? "999+" : level}
             </div>
           </div>
           
@@ -103,21 +135,31 @@ export default function Home() {
             </div>
           </div>
           
-          <h2 className="font-display text-xl text-center mb-2 text-shadow-pixel text-accent uppercase">{profile?.full_name || 'BRILLIANO D.U.'}</h2>
+          <h2 className="font-display text-xl text-center mb-2 text-shadow-pixel text-accent uppercase tracking-tighter">
+            {isAlternate ? 'KANRISHAURUS' : (profile?.full_name || 'BRILLIANO D.U.')}
+          </h2>
           <p className="font-body text-2xl text-muted-foreground mb-6 uppercase tracking-widest border-b-2 border-muted pb-2 w-full text-center">
             Class: {profile?.class_name || 'Web Mage'}
           </p>
 
           <div className="w-full space-y-4">
-            <h3 className="font-display text-xs text-secondary mb-2">- ATTRIBUTES -</h3>
-            {(stats || []).map((stat: any) => (
+            <h3 className="font-display text-xs text-secondary mb-2 uppercase italic tracking-widest">
+              {isAlternate ? '- ALTERNATE STATS -' : '- ATTRIBUTES -'}
+            </h3>
+            {[
+              ...(stats || []),
+              ...(isAlternate ? [{ name: "Unique Skill", val: 100, color: "bg-primary" }] : [])
+            ].map((stat: any) => (
               <div key={stat.name}>
                 <div className="flex justify-between font-body text-lg mb-1">
                   <span>{stat.name}</span>
-                  <span>{stat.val}</span>
+                  <span>{isAlternate ? "99+" : stat.val}</span>
                 </div>
                 <div className="w-full h-3 bg-background border-2 border-white p-[1px]">
-                  <div className={`h-full ${stat.color}`} style={{ width: `${stat.val}%` }} />
+                  <div 
+                    className={`h-full ${stat.color} transition-all duration-1000`} 
+                    style={{ width: `${isAlternate ? 100 : stat.val}%` }} 
+                  />
                 </div>
               </div>
             ))}
@@ -162,12 +204,12 @@ export default function Home() {
             DIALOGUE
           </div>
           
-          <div className="font-body text-2xl leading-relaxed min-h-[100px]">
-            {isComplete ? renderRichText(DIALOGUE_BASE) : displayedText}
+          <div className={cn("font-body text-2xl leading-relaxed min-h-[100px] transition-colors duration-300", dialogueGlitched && "text-destructive brightness-125")}>
+            {isComplete ? renderRichText(dialogueGlitched ? DIALOGUE_GLITCH : DIALOGUE_BASE) : displayedText}
             <span className="animate-blink">_</span>
           </div>
 
-          {isComplete && !accepted && (
+          {isComplete && !accepted && !dialogueGlitched && (
             <div className="mt-8 flex gap-4">
               <button 
                 onClick={handleYes}
@@ -180,6 +222,7 @@ export default function Home() {
               <motion.button 
                 animate={{ x: noPos.x, y: noPos.y }}
                 onMouseEnter={handleNoHover}
+                onClick={handleNo}
                 className="pixel-btn bg-destructive px-8 py-2 text-white"
                 title="No, maybe later..."
               >

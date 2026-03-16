@@ -48,3 +48,6 @@ Thumbs.db
 .cache/
 .local/
 .env
+
+.bun.lock
+package-lock.json
