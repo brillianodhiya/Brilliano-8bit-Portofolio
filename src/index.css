@@ -162,6 +162,11 @@
   .crt-flicker {
     animation: flicker 0.15s infinite;
   }
+
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
 }
 
 @keyframes flicker {

@@ -6,6 +6,8 @@ import { PixelDino } from "./PixelDino";
 import { KonamiEffect } from "./KonamiEffect";
 import { FloatingCoins } from "./FloatingCoins";
 import { VisitorCounter } from "./VisitorCounter";
+import { AvatarWorld } from "./AvatarWorld";
+import { AvatarSetup } from "./AvatarSetup";
 import { useLocation } from "wouter";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -44,15 +46,20 @@ export function Layout({ children }: { children: ReactNode }) {
       {/* Pixel Ground Bar + Dino + Visitor Counter */}
       {!isSplash && (
         <>
+          <AvatarWorld />
           <PixelDino />
+          <AvatarSetup />
 
           {/* Visitor Counter — bottom right HUD */}
-          <div style={{
-            position: "fixed",
-            bottom: 12,
-            right: 12,
-            zIndex: 46,
-          }}>
+          <div 
+            className="hidden md:block"
+            style={{
+              position: "fixed",
+              bottom: 12,
+              right: 12,
+              zIndex: 46,
+            }}
+          >
             <VisitorCounter />
           </div>
 

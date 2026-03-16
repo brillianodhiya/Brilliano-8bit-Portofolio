@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useScore } from "@/hooks/use-score";
 
 interface Coin {
   id: number;
@@ -9,8 +10,8 @@ interface Coin {
 }
 
 const SYMBOLS = { coin: "🪙", star: "⭐", gem: "💎" };
-const SPAWN_INTERVAL = 4000;
-const MAX_COINS = 6;
+const SPAWN_INTERVAL = 3000;
+const MAX_COINS = 8;
 
 let nextId = 1;
 
@@ -18,18 +19,18 @@ function randomCoin(): Coin {
   const types: Coin["type"][] = ["coin", "star", "gem"];
   return {
     id: nextId++,
-    x: 5 + Math.random() * 85,
-    y: 10 + Math.random() * 70,
+    x: 5 + Math.random() * 80,
+    y: 10 + Math.random() * 60,
     type: types[Math.floor(Math.random() * types.length)],
     collected: false,
   };
 }
 
-const SCORES: Record<Coin["type"], number> = { coin: 10, star: 50, gem: 100 };
+const SCORES: Record<Coin["type"], number> = { coin: 10, star: 50, gem: 200 };
 
 export function FloatingCoins() {
+  const { score, addScore } = useScore();
   const [coins, setCoins] = useState<Coin[]>([]);
-  const [score, setScore] = useState(() => parseInt(localStorage.getItem("coin_score") || "0", 10));
   const [popups, setPopups] = useState<{ id: number; x: number; y: number; val: number }[]>([]);
 
   useEffect(() => {
@@ -45,11 +46,8 @@ export function FloatingCoins() {
   }, []);
 
   const collect = useCallback((coin: Coin) => {
-    setCoins(prev => prev.map(c => c.id === coin.id ? { ...c, collected: true } : c));
     const pts = SCORES[coin.type];
-    const newScore = score + pts;
-    setScore(newScore);
-    localStorage.setItem("coin_score", String(newScore));
+    addScore(pts);
     const popup = { id: Date.now(), x: coin.x, y: coin.y, val: pts };
     setPopups(prev => [...prev, popup]);
     setTimeout(() => setPopups(prev => prev.filter(p => p.id !== popup.id)), 1200);

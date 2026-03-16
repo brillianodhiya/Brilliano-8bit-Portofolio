@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { usePortfolioData } from '@/hooks/use-portfolio-data';
+import { useAchievements } from '@/hooks/use-achievements';
 
 export function MusicPlayer() {
   const { data: playlist } = usePortfolioData('playlist');
+  const { unlockAchievement } = useAchievements();
   const [location] = useLocation();
   const [isPlaying, setIsPlaying] = useState(false);
   const isPlayingRef = useRef(false);
@@ -39,11 +41,22 @@ export function MusicPlayer() {
     }
   }, [isPlaying]);
 
-  // Handle track changes
+  // Handle track changes - auto play if it was playing
   useEffect(() => {
-    if (isPlaying && audioRef.current) {
-      audioRef.current.play().catch(() => setIsPlaying(false));
-    }
+    const play = async () => {
+      if (isPlaying && audioRef.current) {
+        try {
+          // Add a tiny delay to allow the 'src' value to propagate
+          await new Promise(resolve => setTimeout(resolve, 50));
+          await audioRef.current.play();
+        } catch (err) {
+          console.warn("Playback failed on track skip:", err);
+          // If it fails, it's usually because of interaction requirement
+          // but we already called resume() in the click handler.
+        }
+      }
+    };
+    play();
   }, [currentIndex]);
 
   // Initialize Audio Engine once
@@ -124,8 +137,15 @@ export function MusicPlayer() {
     return newIndex;
   };
 
-  const nextTrack = () => {
+  const nextTrack = async () => {
     if (!playlist) return;
+    unlockAchievement("music_skip");
+    
+    // Ensure context is running - MUST be in user-gesture handler
+    if (audioCtxRef.current?.state === 'suspended') {
+      await audioCtxRef.current.resume();
+    }
+
     let nextIndex;
     if (isShuffle) {
       nextIndex = getRandomIndex();
@@ -134,10 +154,23 @@ export function MusicPlayer() {
     }
     setCurrentIndex(nextIndex);
     setIsPlaying(true);
+    
+    // Force play after state update if possible
+    if (audioRef.current) {
+      audioRef.current.pause(); // Reset current
+      audioRef.current.load();  // Force new source load
+    }
   };
 
-  const prevTrack = () => {
+  const prevTrack = async () => {
     if (!playlist) return;
+    unlockAchievement("music_skip");
+    
+    // Ensure context is running
+    if (audioCtxRef.current?.state === 'suspended') {
+      await audioCtxRef.current.resume();
+    }
+
     let prevIndex;
     if (isShuffle) {
       prevIndex = getRandomIndex();
@@ -146,6 +179,11 @@ export function MusicPlayer() {
     }
     setCurrentIndex(prevIndex);
     setIsPlaying(true);
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.load();
+    }
   };
 
   const handleEnded = () => {
