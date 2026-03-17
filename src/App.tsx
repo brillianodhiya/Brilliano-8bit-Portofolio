@@ -5,17 +5,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { Layout } from "@/components/Layout";
 import { MusicPlayer } from "@/components/MusicPlayer";
-import Splash from "@/pages/Splash";
-import Home from "@/pages/Home";
-import Portfolio from "@/pages/Portfolio";
-import Education from "@/pages/Education";
-import Certifications from "@/pages/Certifications";
-import Gallery from "@/pages/Gallery";
-import Skills from "@/pages/Skills";
-import Experience from "@/pages/Experience"; // RPG Quest Log section
-import NotFound from "@/pages/not-found";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
+
+// Lazy loading pages for better performance (Code Splitting)
+const Splash = lazy(() => import("@/pages/Splash"));
+const Home = lazy(() => import("@/pages/Home"));
+const Portfolio = lazy(() => import("@/pages/Portfolio"));
+const Education = lazy(() => import("@/pages/Education"));
+const Certifications = lazy(() => import("@/pages/Certifications"));
+const Gallery = lazy(() => import("@/pages/Gallery"));
+const Skills = lazy(() => import("@/pages/Skills"));
+const Experience = lazy(() => import("@/pages/Experience"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 async function trackVisit() {
   if (!supabase) return;
@@ -50,17 +52,23 @@ const queryClient = new QueryClient();
 function Router() {
   return (
     <Layout>
-      <Switch>
-        <Route path="/" component={Splash} />
-        <Route path="/hub" component={Home} />
-        <Route path="/portfolio" component={Portfolio} />
-        <Route path="/experience" component={Experience} />
-        <Route path="/education" component={Education} />
-        <Route path="/certifications" component={Certifications} />
-        <Route path="/gallery" component={Gallery} />
-        <Route path="/skills" component={Skills} />
-        <Route component={NotFound} />
-      </Switch>
+      <Suspense fallback={
+        <div className="w-full h-screen flex items-center justify-center bg-background">
+          <div className="font-display text-accent animate-pulse">LOADING_RESOURCES...</div>
+        </div>
+      }>
+        <Switch>
+          <Route path="/" component={Splash} />
+          <Route path="/hub" component={Home} />
+          <Route path="/portfolio" component={Portfolio} />
+          <Route path="/experience" component={Experience} />
+          <Route path="/education" component={Education} />
+          <Route path="/certifications" component={Certifications} />
+          <Route path="/gallery" component={Gallery} />
+          <Route path="/skills" component={Skills} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
       <MusicPlayer />
     </Layout>
   );
