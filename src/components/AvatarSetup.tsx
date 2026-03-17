@@ -118,7 +118,7 @@ export function AvatarSetup() {
 
   return (
     <>
-      <div className="fixed bottom-24 left-4 z-40">
+      <div className="fixed top-20 sm:top-auto sm:bottom-24 left-4 z-40">
         <button
           onClick={() => {
             if (!isLocked) {
@@ -127,11 +127,16 @@ export function AvatarSetup() {
             }
           }}
           disabled={isLocked && !hasSaved}
-          className={`pixel-btn px-4 py-2 text-[10px] sm:text-xs min-w-[120px] ${
+          className={`pixel-btn flex items-center justify-center transition-all ${
             isLocked ? "bg-gray-500 opacity-60 cursor-not-allowed" : "bg-accent text-accent-foreground"
-          }`}
+          } w-10 h-10 sm:w-auto sm:px-4 sm:py-2`}
         >
-          {hasSaved ? "EDIT AVATAR" : isLocked ? `🔒 ${score}/${UNLOCK_SCORE}` : "✨ SETUP AVATAR"}
+          <span className="hidden sm:inline text-[10px] sm:text-xs min-w-[120px]">
+            {hasSaved ? "EDIT AVATAR" : isLocked ? `🔒 ${score}/${UNLOCK_SCORE}` : "✨ SETUP AVATAR"}
+          </span>
+          <span className="sm:hidden text-lg">
+            {hasSaved ? "👤" : isLocked ? "🔒" : "✨"}
+          </span>
         </button>
       </div>
 
@@ -160,7 +165,7 @@ export function AvatarSetup() {
 
                 <div>
                   <label className="block text-xs mb-2 text-muted-foreground uppercase">Choose Skin</label>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2">
                     {SKINS.map((skin) => (
                       <button
                         key={skin.id}
@@ -168,8 +173,8 @@ export function AvatarSetup() {
                           setSelectedSkin(skin.id);
                           playButtonSound();
                         }}
-                        className={`p-2 border-4 flex items-center justify-center min-w-[70px] min-h-[70px] transition-all ${
-                          selectedSkin === skin.id ? "border-primary bg-primary/20 scale-110" : "border-white/20 bg-background hover:border-white"
+                        className={`p-2 border-4 flex items-center justify-center min-h-[70px] transition-all ${
+                          selectedSkin === skin.id ? "border-primary bg-primary/20 scale-105" : "border-white/20 bg-background hover:border-white"
                         }`}
                       >
                         {skin.idle ? (
@@ -188,14 +193,14 @@ export function AvatarSetup() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 pt-4">
                   <button
                     onClick={() => {
                       handleSave();
                       playButtonSound();
                     }}
                     disabled={isSaving || !name}
-                    className="pixel-btn flex-1 py-3 disabled:opacity-50 min-w-[140px]"
+                    className="pixel-btn py-3 disabled:opacity-50"
                   >
                     {isSaving ? "SAVING..." : hasSaved ? "UPDATE HERO" : "JOIN WORLD"}
                   </button>
@@ -207,7 +212,7 @@ export function AvatarSetup() {
                         playButtonSound();
                       }}
                       disabled={isSaving}
-                      className="pixel-btn pixel-btn-destructive flex-1 py-3 disabled:opacity-50 min-w-[140px]"
+                      className="pixel-btn pixel-btn-destructive py-3 disabled:opacity-50"
                     >
                       {isSaving ? "..." : "BATAL JOIN"}
                     </button>
@@ -218,7 +223,7 @@ export function AvatarSetup() {
                       setIsOpen(false);
                       playButtonSound();
                     }}
-                    className="pixel-btn bg-background text-foreground border-white/40 px-6"
+                    className="pixel-btn bg-background text-foreground border-white/40 px-6 py-3"
                   >
                     X
                   </button>

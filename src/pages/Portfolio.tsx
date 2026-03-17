@@ -50,6 +50,21 @@ export default function Portfolio() {
     return `${import.meta.env.BASE_URL}images/${image}`;
   };
 
+  const getStatusStyles = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case 'ONGOING':
+        return "text-accent border-accent bg-accent/10 animate-pulse";
+      case 'MAINTENANCE':
+        return "text-secondary border-secondary bg-secondary/10 animate-pulse";
+      case 'PAUSED':
+        return "text-muted-foreground border-muted-foreground bg-muted/20";
+      case 'OUTDATED':
+        return "text-destructive border-destructive bg-destructive/10 animate-pulse";
+      default: // COMPLETED or others
+        return "text-primary border-primary bg-primary/10";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="w-full h-64 flex items-center justify-center text-primary">
@@ -112,24 +127,43 @@ export default function Portfolio() {
         ))}
       </div>
 
-      {/* Modal Dialog */}
       <AnimatePresence>
         {selected && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div 
+            className="fixed inset-0 z-[9999] flex items-start justify-center p-2 md:p-4 bg-background/90 backdrop-blur-md cursor-pointer overflow-y-auto pt-20 pb-10"
+            onClick={() => {
+              setSelected(null);
+              playButtonSound();
+            }}
+          >
+            {/* Mobile-Fixed Close Button (Persistent while scrolling) */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelected(null);
+                playButtonSound();
+              }}
+              className="fixed top-6 right-6 w-12 h-12 pixel-btn bg-destructive flex items-center justify-center z-[10000] md:hidden shadow-2xl scale-110 active:scale-95 transition-transform"
+            >
+              <X size={24} className="text-white" />
+            </button>
+
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className={`pixel-panel max-w-2xl w-full p-0 flex flex-col md:flex-row relative ${selected.color}`}
+              onClick={(e) => e.stopPropagation()}
+              className={`pixel-panel max-w-4xl w-full p-0 flex flex-col md:flex-row relative cursor-default ${selected.color} my-4 md:my-8`}
             >
+              {/* Desktop-only Close Button */}
               <button 
                 onClick={() => {
                   setSelected(null);
                   playButtonSound();
                 }}
-                className="absolute -top-4 -right-4 w-10 h-10 pixel-btn bg-destructive flex items-center justify-center z-10"
+                className="hidden md:flex absolute -top-4 -right-4 w-10 h-10 pixel-btn bg-destructive items-center justify-center z-50 hover:scale-110 transition-transform"
               >
-                <X size={20} />
+                <X size={20} className="text-white" />
               </button>
 
               <div className="w-full md:w-2/5 bg-background p-6 flex flex-col items-center justify-center border-b-4 md:border-b-0 md:border-r-4 border-white relative group/modal min-h-[300px]">
@@ -138,13 +172,13 @@ export default function Portfolio() {
                    <>
                      <button 
                        onClick={prevImage}
-                       className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                       className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
                      >
                        <ChevronLeft size={16} />
                      </button>
                      <button 
                        onClick={nextImage}
-                       className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                       className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
                      >
                        <ChevronRight size={16} />
                      </button>
@@ -181,7 +215,10 @@ export default function Portfolio() {
                    </div>
                  </div>
 
-                 <div className="font-display text-[10px] text-center text-primary px-3 py-1 border-2 border-primary bg-primary/10 mt-auto">
+                 <div className={cn(
+                   "font-display text-[10px] text-center px-3 py-1 border-2 mt-auto",
+                   getStatusStyles(selected.status)
+                 )}>
                    STATUS: {selected.status}
                  </div>
               </div>

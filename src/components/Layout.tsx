@@ -22,7 +22,7 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden flex flex-col">
       {/* Dynamic Background Pattern */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-20"
+      <div className="absolute inset-0 z-[-1] pointer-events-none opacity-20"
            style={{
              backgroundImage: `url(${import.meta.env.BASE_URL}images/pixel-bg.png)`,
              backgroundRepeat: 'repeat',
@@ -32,7 +32,7 @@ export function Layout({ children }: { children: ReactNode }) {
       
       {!isSplash && <Navigation />}
       
-      <main className={`relative z-10 flex-grow flex flex-col ${!isSplash ? 'pt-28 pb-24 px-4 sm:px-6 md:px-8' : ''}`}>
+      <main className={`relative flex-grow flex flex-col ${!isSplash ? 'pt-28 pb-24 px-4 sm:px-6 md:px-8' : ''}`}>
         <div className="max-w-6xl mx-auto w-full flex-grow flex flex-col">
           {children}
         </div>

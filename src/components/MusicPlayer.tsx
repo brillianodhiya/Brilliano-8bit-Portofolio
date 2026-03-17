@@ -228,11 +228,11 @@ export function MusicPlayer() {
       />
       
       {location !== '/' && (
-        <div className="fixed bottom-4 left-4 z-50">
+        <div className="fixed bottom-4 left-4 right-4 sm:right-auto z-50">
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="pixel-panel p-2 flex items-center gap-3 bg-card/90 backdrop-blur-sm min-w-[280px] max-w-[320px]"
+            className="pixel-panel p-2 flex items-center gap-2 sm:gap-3 bg-card/90 backdrop-blur-sm min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px]"
           >
             {/* Track Art / Icon */}
             <div className="relative w-10 h-10 border-2 border-white bg-black flex items-center justify-center overflow-hidden shrink-0">
@@ -308,8 +308,8 @@ export function MusicPlayer() {
                   </button>
                 </div>
 
-                {/* REAL RECTIVE VISUALIZER (Widened) */}
-                <div className="flex items-end gap-[1px] h-4 px-1.5 flex-1 justify-center opacity-90 overflow-hidden bg-black/20 py-0.5">
+                {/* REAL RECTIVE VISUALIZER (Widened) - Hidden on mobile */}
+                <div className="hidden sm:flex items-end gap-[1px] h-4 px-1.5 flex-1 justify-center opacity-90 overflow-hidden bg-black/20 py-0.5">
                   {vData.map((h, i) => (
                     <div
                       key={i}
@@ -319,8 +319,8 @@ export function MusicPlayer() {
                   ))}
                 </div>
 
-                {/* Volume Icon */}
-                <div className="group relative shrink-0">
+                {/* Volume Icon - Hidden on mobile */}
+                <div className="group relative shrink-0 hidden sm:block">
                   <Volume2 size={12} className="text-muted-foreground hover:text-white cursor-pointer" />
                   {/* Bridge container to fix hover gap */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 hidden group-hover:block z-50">
