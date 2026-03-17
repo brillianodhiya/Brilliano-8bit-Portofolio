@@ -35,7 +35,7 @@ export function usePortfolioData(table: string) {
       let query = supabase.from(`portfolio_${table}`).select('*');
       
       // Only apply sorting to tables that have display_order column
-      const tablesWithOrder = ['attributes', 'skills', 'projects', 'awards', 'education', 'gallery'];
+      const tablesWithOrder = ['attributes', 'skills', 'projects', 'awards', 'education', 'gallery', 'experience'];
       if (tablesWithOrder.includes(table)) {
         query = query.order('display_order', { ascending: true });
       }
