@@ -9,6 +9,7 @@ import { playButtonSound } from "@/lib/audio";
 const NAV_ITEMS = [
   { path: "/hub", label: "STATUS" },
   { path: "/portfolio", label: "INVENTORY" },
+  { path: "/experience", label: "QUEST LOG" },
   { path: "/education", label: "LORE" },
   { path: "/certifications", label: "TROPHIES" },
   { path: "/gallery", label: "MAP" },

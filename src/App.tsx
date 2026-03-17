@@ -12,6 +12,7 @@ import Education from "@/pages/Education";
 import Certifications from "@/pages/Certifications";
 import Gallery from "@/pages/Gallery";
 import Skills from "@/pages/Skills";
+import Experience from "@/pages/Experience"; // RPG Quest Log section
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -53,6 +54,7 @@ function Router() {
         <Route path="/" component={Splash} />
         <Route path="/hub" component={Home} />
         <Route path="/portfolio" component={Portfolio} />
+        <Route path="/experience" component={Experience} />
         <Route path="/education" component={Education} />
         <Route path="/certifications" component={Certifications} />
         <Route path="/gallery" component={Gallery} />
