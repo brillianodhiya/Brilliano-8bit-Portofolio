@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_TOKEN = process.env.GH_PAT;
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'Kanrishaurus';
 const GITLAB_TOKEN = process.env.GITLAB_TOKEN;
 const GITLAB_USER_ID = process.env.GITLAB_USER_ID; 
