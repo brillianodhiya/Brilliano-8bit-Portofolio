@@ -27,7 +27,8 @@ export default function Portfolio() {
     color: p.color || PROJECT_COLORS[idx % PROJECT_COLORS.length],
     images: p.images || ["cartridge-1.png"],
     demoUrl: p.demo_url,
-    githubUrl: p.github_url
+    githubUrl: p.github_url,
+    company: p.company || "Independent"
   }));
 
   const [selected, setSelected] = useState<any | null>(null);
@@ -224,8 +225,15 @@ export default function Portfolio() {
               </div>
 
               <div className="w-full md:w-3/5 p-6 flex flex-col">
-                <h2 className="font-display text-xl text-foreground text-shadow-pixel mb-2">{selected.title}</h2>
-                <p className="font-display text-xs text-secondary mb-6">{selected.type}</p>
+                <h2 className="font-display text-xl text-foreground text-shadow-pixel mb-1">{selected.title}</h2>
+                <div className="flex gap-2 items-center mb-6">
+                  <span className="font-display text-[8px] text-secondary uppercase bg-secondary/10 px-2 py-0.5 border border-secondary/20">
+                    {selected.type}
+                  </span>
+                  <span className="font-display text-[8px] text-accent uppercase bg-accent/10 px-2 py-0.5 border border-accent/20">
+                    🏢 {selected.company}
+                  </span>
+                </div>
                 
                 <p className="font-body text-2xl leading-tight mb-6 flex-grow">
                   {selected.desc}
