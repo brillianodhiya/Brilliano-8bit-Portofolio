@@ -2,7 +2,7 @@ name: Activity Sync
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Midnight every day
+    - cron: '15 17 * * *' # 00:15 WIB (GMT+7)
   workflow_dispatch: # Allow manual run
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GH_PAT: ${{ secrets.GH_PAT }}
-          GITHUB_USERNAME: 'Kanrishaurus' # User can change this
+          GITHUB_USERNAME: 'brillianodhiya'
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           GITLAB_USER_ID: ${{ secrets.GITLAB_USER_ID }}
         run: node scripts/sync-activity.js
