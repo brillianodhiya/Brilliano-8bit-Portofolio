@@ -1,5 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Load .env manually if not already present in process.env
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envPath = path.resolve(__dirname, '../.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const [key, ...valueParts] = line.split('=');
+    if (key && valueParts.length > 0) {
+      const value = valueParts.join('=').trim();
+      if (!process.env[key.trim()]) {
+        process.env[key.trim()] = value.replace(/^['"]|['"]$/g, '');
+      }
+    }
+  });
+}
 
 /**
  * Activity Sync Script
@@ -23,7 +42,6 @@ async function fetchGitHubActivity() {
 
   console.log('Fetching GitHub activity for:', GITHUB_USERNAME);
   
-  // Basic query for user total contributions via GraphQL
   const query = `
     query($username: String!) {
       user(login: $username) {
@@ -50,11 +68,20 @@ async function fetchGitHubActivity() {
 
     const counts = {};
     const weeks = response.data.data.user.contributionsCollection.contributionCalendar.weeks;
+    let totalDays = 0;
+    let totalCount = 0;
+
     weeks.forEach(week => {
       week.contributionDays.forEach(day => {
         counts[day.date] = day.contributionCount;
+        if (day.contributionCount > 0) {
+          totalDays++;
+          totalCount += day.contributionCount;
+        }
       });
     });
+
+    console.log(`GitHub sync finished: ${totalCount} contributions across ${totalDays} active days.`);
     return counts;
   } catch (error) {
     console.error('Error fetching GitHub:', error.message);
@@ -63,28 +90,50 @@ async function fetchGitHubActivity() {
 }
 
 async function fetchGitLabActivity() {
-  if (!GITLAB_TOKEN) {
+  if (!GITLAB_TOKEN || !GITLAB_USER_ID) {
     console.log('GitLab credentials missing, skipping...');
     return {};
   }
 
-  console.log('Fetching GitLab activity...');
-  // GitLab events API is paginated and less direct for a "calendar", 
-  // but we can fetch events from the last 90 days.
+  console.log('Fetching GitLab activity (last 365 days)...');
   const counts = {};
+  const afterDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  
   try {
-    const response = await axios.get(
-      `https://gitlab.com/api/v4/users/${GITLAB_USER_ID}/events?after=${new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`,
-      { headers: { 'Private-Token': GITLAB_TOKEN } }
-    );
+    let page = 1;
+    let hasMore = true;
+    let totalEvents = 0;
 
-    response.data.forEach(event => {
-      const date = event.created_at.split('T')[0];
-      counts[date] = (counts[date] || 0) + 1;
-    });
+    while (hasMore && page <= 10) { // Limit to 10 pages (1000 events) for safety
+      const response = await axios.get(
+        `https://gitlab.com/api/v4/users/${GITLAB_USER_ID}/events?after=${afterDate}&per_page=100&page=${page}`,
+        { headers: { 'Private-Token': GITLAB_TOKEN } }
+      );
+
+      if (response.data.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      response.data.forEach(event => {
+        const date = event.created_at.split('T')[0];
+        counts[date] = (counts[date] || 0) + 1;
+        totalEvents++;
+      });
+
+      console.log(`  Page ${page}: Found ${response.data.length} events...`);
+      page++;
+      
+      // If we got fewer than 100 events, it's the last page
+      if (response.data.length < 100) {
+        hasMore = false;
+      }
+    }
+
+    console.log(`GitLab sync finished: ${totalEvents} total events across ${Object.keys(counts).length} days.`);
     return counts;
   } catch (error) {
-    console.error('Error fetching GitLab:', error.message);
+    console.error('Error fetching GitLab:', error.response?.data || error.message);
     return {};
   }
 }
