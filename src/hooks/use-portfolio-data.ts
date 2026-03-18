@@ -39,6 +39,9 @@ export function usePortfolioData(table: string) {
       if (tablesWithOrder.includes(table)) {
         query = query.order('display_order', { ascending: true });
       }
+
+      // Ensure all rows are returned (Supabase default can be limited)
+      query = query.limit(500);
         
       const { data, error } = await query;
         
@@ -46,6 +49,7 @@ export function usePortfolioData(table: string) {
       return data;
     },
     enabled: !!supabase,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache
   });
 }
 
