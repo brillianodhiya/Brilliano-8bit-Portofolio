@@ -28,7 +28,18 @@ export default defineConfig({
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules")) {
-            return "vendor";
+            if (id.includes("framer-motion")) {
+              return "framer-motion";
+            }
+            if (id.includes("lucide-react") || id.includes("@radix-ui")) {
+              return "ui-vendor";
+            }
+            if (id.includes("@supabase") || id.includes("@tanstack")) {
+              return "data-vendor";
+            }
+            if (id.includes("react") || id.includes("wouter") || id.includes("scheduler") || id.includes("object-assign")) {
+              return "react-vendor";
+            }
           }
         },
       },
