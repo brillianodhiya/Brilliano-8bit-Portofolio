@@ -232,7 +232,7 @@ export function MusicPlayer() {
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="pixel-panel p-2 flex items-center gap-2 sm:gap-3 bg-card/90 backdrop-blur-sm min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px]"
+            className="pixel-panel p-1.5 sm:p-2 flex items-center gap-2 sm:gap-3 bg-card/90 backdrop-blur-sm min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px]"
           >
             {/* Track Art / Icon */}
             <div className="relative w-10 h-10 border-2 border-white bg-black flex items-center justify-center overflow-hidden shrink-0">

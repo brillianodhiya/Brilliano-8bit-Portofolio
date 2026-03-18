@@ -72,25 +72,27 @@ export function FloatingCoins() {
         <span className="text-yellow-400/60 text-[6px]">COLLECT!</span>
       </div>
 
-      {/* Floating coins */}
-      {coins.filter(c => !c.collected).map(coin => (
-        <div
-          key={coin.id}
-          className="fixed z-40 cursor-pointer select-none"
-          style={{
-            left: `${coin.x}vw`,
-            top: `${coin.y}vh`,
-            fontSize: "24px",
-            animation: "floatBob 2s ease-in-out infinite",
-            filter: "drop-shadow(0 0 6px rgba(255,215,0,0.8))",
-            transition: "transform 0.1s",
-          }}
-          onClick={() => collect(coin)}
-          title={`+${SCORES[coin.type]} pts`}
-        >
-          {SYMBOLS[coin.type]}
-        </div>
-      ))}
+      {/* Floating coins - hidden on mobile */}
+      <div className="hidden md:block">
+        {coins.filter(c => !c.collected).map(coin => (
+          <div
+            key={coin.id}
+            className="fixed z-40 cursor-pointer select-none"
+            style={{
+              left: `${coin.x}vw`,
+              top: `${coin.y}vh`,
+              fontSize: "24px",
+              animation: "floatBob 2s ease-in-out infinite",
+              filter: "drop-shadow(0 0 6px rgba(255,215,0,0.8))",
+              transition: "transform 0.1s",
+            }}
+            onClick={() => collect(coin)}
+            title={`+${SCORES[coin.type]} pts`}
+          >
+            {SYMBOLS[coin.type]}
+          </div>
+        ))}
+      </div>
 
       {/* Score popups */}
       {popups.map(p => (

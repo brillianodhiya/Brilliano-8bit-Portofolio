@@ -32,7 +32,7 @@ export function Layout({ children }: { children: ReactNode }) {
       
       {!isSplash && <Navigation />}
       
-      <main className={`relative flex-grow flex flex-col ${!isSplash ? 'pt-28 pb-24 px-4 sm:px-6 md:px-8' : ''}`}>
+      <main className={`relative flex-grow flex flex-col ${!isSplash ? 'pt-44 sm:pt-36 md:pt-28 pb-24 px-4 sm:px-6 md:px-8' : ''}`}>
         <div className="max-w-6xl mx-auto w-full flex-grow flex flex-col">
           {children}
         </div>
