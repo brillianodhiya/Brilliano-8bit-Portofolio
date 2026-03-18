@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
+import { SEO } from "@/components/SEO";
 
 export default function Splash() {
   const [, setLocation] = useLocation();
@@ -17,6 +18,10 @@ export default function Splash() {
 
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center relative z-10 bg-background/80 backdrop-blur-sm">
+      <SEO 
+        title="Brilliano Dhiya Ulhaq | Portfolio" 
+        description="Welcome to the 8-bit RPG portfolio of Brilliano Dhiya Ulhaq. Press START to enter the realm of frontend engineering." 
+      />
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

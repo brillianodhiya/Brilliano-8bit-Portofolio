@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { BookOpen, GraduationCap, MapPin, Loader2 } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 export default function Education() {
   const { data: educationData, isLoading } = usePortfolioData('education');
@@ -26,6 +27,10 @@ export default function Education() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-4xl mx-auto flex flex-col gap-8"
     >
+      <SEO 
+        title="Lore & Origin | Education" 
+        description="The chronicles of Brilliano Dhiya Ulhaq's training and academic background in Computer Science." 
+      />
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl md:text-4xl text-secondary text-shadow-pixel mb-4">LORE & ORIGIN</h2>
         <p className="font-body text-2xl text-muted-foreground">The chronicles of past training.</p>

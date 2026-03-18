@@ -7,6 +7,7 @@ import { useTypingEffect } from "@/hooks/use-typing-effect";
 import { useProfile, usePortfolioData, calculateLevel } from "@/hooks/use-portfolio-data";
 import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 export default function Home() {
   const { unlockAchievement } = useAchievements();
@@ -92,6 +93,10 @@ export default function Home() {
       animate={{ opacity: 1, y: 0 }}
       className={cn("w-full flex flex-col lg:flex-row gap-8 transition-colors duration-500", isAlternate && "theme-red")}
     >
+      <SEO 
+        title="Status | Brilliano Portfolio" 
+        description="Check the stats and attributes of Brilliano Dhiya Ulhaq, a Technical Project Lead and Senior Frontend Developer." 
+      />
       {/* Left Column: Character Profile */}
       <div className="w-full lg:w-1/3 flex flex-col gap-6">
         <div className="pixel-panel p-6 flex flex-col items-center relative overflow-hidden">

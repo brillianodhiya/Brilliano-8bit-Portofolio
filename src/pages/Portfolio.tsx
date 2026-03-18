@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 const PROJECT_COLORS = [
   "border-primary",
@@ -80,6 +81,10 @@ export default function Portfolio() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full flex flex-col gap-8"
     >
+      <SEO 
+        title="Inventory | Projects" 
+        description="Explore the inventory of web applications, systems, and artifacts built by Brilliano Dhiya Ulhaq." 
+      />
       <div className="flex justify-between items-end border-b-4 border-white pb-4">
         <div>
           <h2 className="font-display text-2xl md:text-3xl text-primary text-shadow-pixel">INVENTORY</h2>

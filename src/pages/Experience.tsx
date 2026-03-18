@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Briefcase, Calendar, CheckCircle2, Loader2, Sparkles, Terminal } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 interface Experience {
   id: string;
@@ -32,6 +33,10 @@ export default function Experience() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-5xl mx-auto flex flex-col gap-8 pb-12"
     >
+      <SEO 
+        title="Quest Log | Experience" 
+        description="Explore the professional quest log and career journey of Brilliano Dhiya Ulhaq, featuring major campaigns in web development." 
+      />
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl md:text-5xl text-accent text-shadow-pixel mb-4 uppercase flex items-center justify-center gap-3">
           <Sparkles className="text-yellow-400" /> QUEST LOG <Sparkles className="text-yellow-400" />

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 export default function Gallery() {
   const { data: imagesData, isLoading } = usePortfolioData('gallery');
@@ -21,6 +22,10 @@ export default function Gallery() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full flex flex-col gap-8"
     >
+      <SEO 
+        title="Map | Gallery & Videos" 
+        description="Captured memories and programming tutorials by Brilliano Dhiya Ulhaq. Screnshots and tech environment videos." 
+      />
       <div className="text-center mb-4">
         <h2 className="font-display text-3xl text-primary text-shadow-pixel mb-4">SCREENSHOTS</h2>
         <p className="font-body text-2xl text-muted-foreground">Memories captured during the campaign.</p>

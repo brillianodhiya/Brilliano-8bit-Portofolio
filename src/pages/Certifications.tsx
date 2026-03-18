@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Award, Star, Shield, Zap, Loader2 } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { playButtonSound } from "@/lib/audio";
+import { SEO } from "@/components/SEO";
 
 const ICON_MAP: Record<string, any> = {
   Award, Star, Shield, Zap
@@ -50,6 +51,10 @@ export default function Certifications() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full flex flex-col gap-8"
     >
+      <SEO 
+        title="Trophy Room | Certifications" 
+        description="View the certifications and professional achievements unlocked by Brilliano Dhiya Ulhaq." 
+      />
       <div className="flex flex-col md:flex-row justify-between items-center border-b-4 border-white pb-6 mb-4">
         <div className="text-center md:text-left mb-4 md:mb-0">
           <h2 className="font-display text-3xl text-accent text-shadow-pixel">TROPHY ROOM</h2>

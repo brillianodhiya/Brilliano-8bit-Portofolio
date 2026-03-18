@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# Sitemap: https://brilli.pages.dev/sitemap.xml
