@@ -1,38 +1,17 @@
-import { useState, useEffect } from "react";
-import { playButtonSound } from "@/lib/audio";
+import { useTheme } from "@/context/ThemeContext";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true);
+  const { isDark, isKanrishaurus, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("portfolio_theme");
-    const dark = saved !== "light";
-    setIsDark(dark);
-    applyTheme(dark);
-  }, []);
-
-  function applyTheme(dark: boolean) {
-    const root = document.documentElement;
-    if (dark) {
-      root.classList.remove("light");
-      root.classList.add("dark-mode");
-    } else {
-      root.classList.add("light");
-      root.classList.remove("dark-mode");
-    }
-  }
-
-  const toggle = () => {
-    playButtonSound();
-    const next = !isDark;
-    setIsDark(next);
-    localStorage.setItem("portfolio_theme", next ? "dark" : "light");
-    applyTheme(next);
-  };
+  if (isKanrishaurus) return (
+    <div className="flex items-center gap-2 px-2 py-1 border-2 border-red-500 bg-black animate-pulse" style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "8px" }}>
+      <span className="text-red-500">HAZARD</span>
+    </div>
+  );
 
   return (
     <button
-      onClick={toggle}
+      onClick={toggleTheme}
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
       className="flex items-center gap-2 px-2 py-1 border-2 border-white/50 bg-card hover:border-white transition-colors"
       style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "8px" }}

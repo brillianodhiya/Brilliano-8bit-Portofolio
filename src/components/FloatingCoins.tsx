@@ -64,12 +64,12 @@ export function FloatingCoins() {
     <>
       {/* Score display */}
       <div
-        className="fixed top-24 left-4 z-40 hidden md:flex flex-col items-center gap-1 px-3 py-2 border-2 border-yellow-400/50 bg-background/80"
+        className="fixed top-24 left-4 z-40 hidden md:flex flex-col items-center gap-1 px-3 py-2 border-2 border-yellow-500/50 bg-background/80"
         style={{ fontFamily: "'Press Start 2P', cursive" }}
       >
-        <span className="text-yellow-400 text-[7px]">SCORE</span>
-        <span className="text-white text-sm tabular-nums">{score.toLocaleString()}</span>
-        <span className="text-yellow-400/60 text-[6px]">COLLECT!</span>
+        <span className="text-yellow-600 dark:text-yellow-400 text-[7px]">SCORE</span>
+        <span className="text-foreground text-sm tabular-nums">{score.toLocaleString()}</span>
+        <span className="text-yellow-600/60 dark:text-yellow-400/60 text-[6px]">COLLECT!</span>
       </div>
 
       {/* Floating coins - hidden on mobile */}

@@ -7,6 +7,7 @@ import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
+import { useTheme } from "@/context/ThemeContext";
 
 const PROJECT_COLORS = [
   "border-primary",
@@ -19,13 +20,14 @@ const PROJECT_COLORS = [
 ];
 
 export default function Portfolio() {
+  const { isKanrishaurus } = useTheme();
   const { data: projectsData, isLoading } = usePortfolioData('projects');
   
   const PROJECTS = (projectsData || []).map((p: any, idx: number) => ({
     ...p,
     desc: p.description,
     type: p.type || "Quest",
-    color: p.color || PROJECT_COLORS[idx % PROJECT_COLORS.length],
+    color: isKanrishaurus ? "border-red-500" : (p.color || PROJECT_COLORS[idx % PROJECT_COLORS.length]),
     images: p.images || ["cartridge-1.png"],
     demoUrl: p.demo_url,
     githubUrl: p.github_url,
@@ -87,11 +89,15 @@ export default function Portfolio() {
       />
       <div className="flex justify-between items-end border-b-4 border-white pb-4">
         <div>
-          <h2 className="font-display text-2xl md:text-3xl text-primary text-shadow-pixel">INVENTORY</h2>
-          <p className="font-body text-xl text-muted-foreground mt-2">Projects & Artifacts Collected</p>
+          <h2 className="font-display text-2xl md:text-3xl text-primary text-shadow-pixel">
+            {isKanrishaurus ? "WAR SPOILS" : "INVENTORY"}
+          </h2>
+          <p className="font-body text-xl text-muted-foreground mt-2">
+            {isKanrishaurus ? "Artifacts seized from defeated systems" : "Projects & Artifacts Collected"}
+          </p>
         </div>
         <div className="font-display text-sm text-secondary bg-background px-3 py-1 border-2 border-secondary hidden sm:block">
-          CAPACITY: {PROJECTS.length}/99
+          CAPACITY: {isKanrishaurus ? "INF" : PROJECTS.length}/{isKanrishaurus ? "INF" : "99"}
         </div>
       </div>
 

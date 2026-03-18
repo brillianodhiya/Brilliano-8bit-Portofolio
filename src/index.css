@@ -60,16 +60,16 @@
   --foreground: 240 64% 11%;
   --primary: 190 80% 35%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 45 90% 45%;
+  --secondary: 45 90% 35%;
   --secondary-foreground: 240 64% 11%;
-  --accent: 120 60% 40%;
+  --accent: 120 60% 30%;
   --accent-foreground: 0 0% 100%;
   --destructive: 16 90% 50%;
   --destructive-foreground: 0 0% 100%;
   --card: 50 80% 90%;
   --card-foreground: 240 64% 11%;
   --muted: 55 60% 85%;
-  --muted-foreground: 240 30% 40%;
+  --muted-foreground: 240 30% 25%;
   --border: 240 64% 11%;
 }
 
@@ -221,8 +221,43 @@
 /* Red Theme for Kanrishaurus mode */
 .theme-red {
   --primary: 0 100% 50%; /* Pure Red */
-  --secondary: 0 100% 30%; /* Dark Red/Maroon */
-  --accent: 0 100% 70%; /* Light Red/Pinkish */
-  --card: 345 40% 15%; /* Deep Red-Black */
+  --secondary: 0 100% 35%; /* Darker Red */
+  --accent: 0 100% 70%; /* Light Red */
+  --card: 0 40% 10%; /* Very Deep Red-Black */
   --primary-foreground: 0 0% 100%;
+  --background: 0 50% 5%;
+  --foreground: 0 20% 90%;
+  --muted: 0 30% 15%;
+  --muted-foreground: 0 40% 60%;
+  --border: 0 100% 50%;
+}
+
+.theme-red::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(255, 0, 0, 0.15) 100%);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.theme-red .crt-flicker {
+  animation: red-flicker 0.1s infinite;
+}
+
+@keyframes red-flicker {
+  0% { opacity: 0.85; filter: hue-rotate(0deg); }
+  50% { opacity: 1; filter: hue-rotate(10deg); }
+  100% { opacity: 0.9; filter: hue-rotate(-10deg); }
+}
+
+/* Red Scrollbar Override */
+.theme-red::-webkit-scrollbar-thumb {
+  background: hsl(0, 100%, 50%);
+  border-color: #000;
+  box-shadow: inset -2px -2px 0px rgba(0,0,0,0.6), inset 2px 2px 0px rgba(255,255,255,0.2);
+}
+
+.theme-red::-webkit-scrollbar {
+  background: #1a0000;
 }

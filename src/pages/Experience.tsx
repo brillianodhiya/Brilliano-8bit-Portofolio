@@ -3,6 +3,8 @@ import { Briefcase, Calendar, CheckCircle2, Loader2, Sparkles, Terminal } from "
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
+import { useTheme } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
 
 interface Experience {
   id: string;
@@ -15,6 +17,7 @@ interface Experience {
 }
 
 export default function Experience() {
+  const { isKanrishaurus } = useTheme();
   const { data: experienceData, isLoading } = usePortfolioData('experience');
 
   if (isLoading) {
@@ -39,9 +42,13 @@ export default function Experience() {
       />
       <div className="text-center mb-8">
         <h2 className="font-display text-3xl md:text-5xl text-accent text-shadow-pixel mb-4 uppercase flex items-center justify-center gap-3">
-          <Sparkles className="text-yellow-400" /> QUEST LOG <Sparkles className="text-yellow-400" />
+          <Sparkles className={cn("text-yellow-400", isKanrishaurus && "text-red-600")} /> 
+          {isKanrishaurus ? "CONQUEST LOG" : "QUEST LOG"}
+          <Sparkles className={cn("text-yellow-400", isKanrishaurus && "text-red-600")} />
         </h2>
-        <p className="font-body text-2xl text-muted-foreground">Major campaigns and missions completed in the professional realm.</p>
+        <p className="font-body text-2xl text-muted-foreground">
+          {isKanrishaurus ? "Systems dismantled and territories acquired." : "Major campaigns and missions completed in the professional realm."}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -58,7 +65,7 @@ export default function Experience() {
             <div className="bg-muted/30 border-b-4 border-white p-4 flex justify-between items-center gap-4">
               <div className="flex items-center gap-2 text-accent">
                 <Briefcase size={14} className="flex-shrink-0" />
-                <span className="font-display text-[8px] uppercase tracking-wider whitespace-nowrap">RANK: SENIOR</span>
+                <span className="font-display text-[8px] uppercase tracking-wider whitespace-nowrap">RANK: {isKanrishaurus ? "OVERLORD" : "SENIOR"}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
                 <Calendar size={12} className="flex-shrink-0" />
@@ -99,12 +106,12 @@ export default function Experience() {
               {/* Status Indicator */}
               <div className="mt-auto pt-4 border-t-2 border-white/5 flex items-center justify-between gap-4">
                 {quest.period.toLowerCase().includes('present') ? (
-                  <div className="font-display text-[7px] text-cyan-400 animate-pulse whitespace-nowrap">
-                    [ ONGOING_MISSION ]
+                  <div className={cn("font-display text-[7px] animate-pulse whitespace-nowrap", isKanrishaurus ? "text-red-600" : "text-cyan-400")}>
+                    [ {isKanrishaurus ? "CURRENTLY_INVADING" : "ONGOING_MISSION"} ]
                   </div>
                 ) : (
-                  <div className="font-display text-[7px] text-green-500 animate-pulse whitespace-nowrap">
-                    [ MISSION_COMPLETED ]
+                  <div className={cn("font-display text-[7px] animate-pulse whitespace-nowrap", isKanrishaurus ? "text-red-800" : "text-green-500")}>
+                    [ {isKanrishaurus ? "TERRITORY_ACQUIRED" : "MISSION_COMPLETED"} ]
                   </div>
                 )}
               </div>

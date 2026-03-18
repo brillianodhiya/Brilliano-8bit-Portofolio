@@ -3,12 +3,14 @@ import { cn } from "@/lib/utils";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { subDays, format, startOfWeek, addDays } from "date-fns";
 import { Diamond } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 // Generate activity grid based on real data
 const WEEKS = 52;
 const DAYS_PER_WEEK = 7;
 
 export function CommitGraph() {
+  const { isKanrishaurus } = useTheme();
   const { data: logData } = usePortfolioData('activity_log');
   const [hovered, setHovered] = useState<{ count: number; date: string; x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,6 +42,14 @@ export function CommitGraph() {
 
   const getColor = (count: number) => {
     if (count === 0) return "bg-muted/20 border-black/40";
+    
+    if (isKanrishaurus) {
+      if (count < 3) return "bg-[#4a0000] border-[#660000] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.4),inset_2px_2px_0px_rgba(255,255,255,0.05)]";
+      if (count < 6) return "bg-[#800000] border-[#990000] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.4),inset_2px_2px_0px_rgba(255,255,255,0.05)]";
+      if (count < 10) return "bg-[#b30000] border-[#cc0000] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.5),inset_2px_2px_0px_rgba(255,255,255,0.1)]";
+      return "bg-[#ff0000] border-white shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.5),inset_2px_2px_0px_rgba(255,255,255,0.2)] animate-pulse";
+    }
+
     if (count < 3) return "bg-[#0e4429] border-[#1b613b] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.4),inset_2px_2px_0px_rgba(255,255,255,0.1)]";
     if (count < 6) return "bg-[#006d32] border-[#26a641] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.4),inset_2px_2px_0px_rgba(255,255,255,0.1)]";
     if (count < 10) return "bg-[#26a641] border-[#39d353] shadow-[inset_-2px_-2px_0px_rgba(0,0,0,0.5),inset_2px_2px_0px_rgba(255,255,255,0.2)]";
@@ -77,7 +87,7 @@ export function CommitGraph() {
           }}
         >
           <div className="bg-black text-white text-[10px] px-3 py-1.5 whitespace-nowrap border-2 border-white font-display shadow-[4px_4px_0px_rgba(0,0,0,1)] ring-1 ring-primary/30">
-            {hovered.count} XP [{hovered.date}]
+            {hovered.count} {isKanrishaurus ? "SOULS" : "XP"} [{hovered.date}]
           </div>
           <div className="w-2.5 h-2.5 bg-black border-r-2 border-b-2 border-white rotate-45 -mt-1.5 shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
         </div>
@@ -115,15 +125,15 @@ export function CommitGraph() {
 
       <div className="flex flex-col sm:flex-row justify-between items-center text-muted-foreground font-body text-[10px] mt-4 px-1 gap-4">
         <div className="flex items-center gap-3 bg-black/20 p-2 border-2 border-white/10 pixel-corners">
-          <span className="opacity-60 uppercase text-[8px]">Rarity:</span>
+          <span className="opacity-100 uppercase text-[8px]">{isKanrishaurus ? "Corruption:" : "Rarity:"}</span>
           <div className="flex gap-1.5">
             <div className="w-3 h-3 bg-muted/20 border-2 border-black/40" title="No Activity" />
-            <div className="w-3 h-3 bg-[#0e4429] border-2 border-[#1b613b]" title="Common" />
-            <div className="w-3 h-3 bg-[#006d32] border-2 border-[#26a641]" title="Uncommon" />
-            <div className="w-3 h-3 bg-[#26a641] border-2 border-[#39d353]" title="Rare" />
-            <div className="w-3 h-3 bg-[#39d353] border-2 border-white animate-pulse" title="Legendary" />
+            <div className={cn("w-3 h-3 border-2", isKanrishaurus ? "bg-[#4a0000] border-[#660000]" : "bg-[#0e4429] border-[#1b613b]")} />
+            <div className={cn("w-3 h-3 border-2", isKanrishaurus ? "bg-[#800000] border-[#990000]" : "bg-[#006d32] border-[#26a641]")} />
+            <div className={cn("w-3 h-3 border-2", isKanrishaurus ? "bg-[#b30000] border-[#cc0000]" : "bg-[#26a641] border-[#39d353]")} />
+            <div className={cn("w-3 h-3 border-2 animate-pulse", isKanrishaurus ? "bg-[#ff0000] border-white" : "bg-[#39d353] border-white")} />
           </div>
-          <span className="opacity-60 uppercase text-[8px]">Intensity</span>
+          <span className="opacity-100 uppercase text-[8px]">{isKanrishaurus ? "Malevolence" : "Intensity"}</span>
         </div>
         
         <div className="flex items-center gap-4">
@@ -132,7 +142,7 @@ export function CommitGraph() {
             <span className="font-display text-[8px]">ELITE RADIANCE</span>
           </div>
           <div className="uppercase tracking-[0.2em] font-display text-[8px] border-b-2 border-primary/30 pb-1">
-            {totalActivity} CONTRIBUTIONS COLLECTED
+            {totalActivity} {isKanrishaurus ? "SOULS REAPED" : "CONTRIBUTIONS COLLECTED"}
           </div>
         </div>
       </div>

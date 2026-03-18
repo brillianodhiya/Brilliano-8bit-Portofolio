@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Download, Terminal, Coffee, Code2, Cpu, Loader2 } from "lucide-react";
+import { Download, Terminal, Coffee, Code2, Cpu, Loader2, Github, Linkedin } from "lucide-react";
 import { CommitGraph } from "@/components/CommitGraph";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
@@ -9,11 +9,13 @@ import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
 
+import { useTheme } from "@/context/ThemeContext";
+
 export default function Home() {
   const { unlockAchievement } = useAchievements();
+  const { isKanrishaurus, toggleKanrishaurus } = useTheme();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = usePortfolioData('attributes');
-  const [isAlternate, setIsAlternate] = useState(false);
   
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
@@ -72,9 +74,9 @@ export default function Home() {
   // Helper to colorize hardcoded text
   const renderRichText = (fullText: string) => {
     return fullText.split(/(Brilliano|Accept mission|World 1-1)/g).map((part, i) => {
-      if (part === "Brilliano") return <span key={i} style={{ color: '#FFD700' }}>{part}</span>;
-      if (part === "Accept mission") return <span key={i} style={{ color: '#00FFFF' }}>{part}</span>;
-      if (part === "World 1-1") return <span key={i} style={{ color: '#00FF00' }}>{part}</span>;
+      if (part === "Brilliano") return <span key={i} className="text-secondary">{part}</span>;
+      if (part === "Accept mission") return <span key={i} className="text-primary">{part}</span>;
+      if (part === "World 1-1") return <span key={i} className="text-accent">{part}</span>;
       return part;
     });
   };
@@ -91,11 +93,11 @@ export default function Home() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("w-full flex flex-col lg:flex-row gap-8 transition-colors duration-500", isAlternate && "theme-red")}
+      className={cn("w-full flex flex-col lg:flex-row gap-8 transition-colors duration-500")}
     >
       <SEO 
-        title="Status | Brilliano Portfolio" 
-        description="Check the stats and attributes of Brilliano Dhiya Ulhaq, a Technical Project Lead and Senior Frontend Developer." 
+        title={isKanrishaurus ? "KANRISHAURUS | FINAL BOSS" : "Status | Brilliano Portfolio"}
+        description={isKanrishaurus ? "THE HIDDEN BOSS HAS AWAKENED." : "Check the stats and attributes of Brilliano Dhiya Ulhaq."}
       />
       {/* Left Column: Character Profile */}
       <div className="w-full lg:w-1/3 flex flex-col gap-6">
@@ -105,9 +107,9 @@ export default function Home() {
           <div className="relative mb-6">
             <div 
               onClick={() => {
-                const next = !isAlternate;
-                setIsAlternate(next);
-                if (next) {
+                const wasAlternate = isKanrishaurus;
+                toggleKanrishaurus();
+                if (!wasAlternate) {
                   unlockAchievement("hidden_persona");
                   playSound('boss');
                 }
@@ -116,23 +118,23 @@ export default function Home() {
             >
               <AnimatePresence mode="wait">
                 <motion.img 
-                  key={isAlternate ? 'alt' : 'normal'}
+                  key={isKanrishaurus ? 'alt' : 'normal'}
                   initial={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
                   animate={{ filter: 'brightness(1) grayscale(0)', opacity: 1 }}
                   exit={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
-                  src={isAlternate 
+                  src={isKanrishaurus 
                     ? `${import.meta.env.BASE_URL}me-alternate2.png`
                     : (profile?.avatar_url 
                       ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${import.meta.env.BASE_URL}${profile.avatar_url}`) 
                       : `${import.meta.env.BASE_URL}images/pixel-avatar.png`)} 
-                  alt={isAlternate ? "Kanrishaurus" : (profile?.name || 'Brilliano')} 
+                  alt={isKanrishaurus ? "Kanrishaurus" : (profile?.name || 'Brilliano')} 
                   className="w-full h-full object-cover rendering-pixelated"
                 />
               </AnimatePresence>
               <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground border-2 border-white px-2 py-1 font-display text-[10px] z-10">
-              LVL.{isAlternate ? "999+" : level}
+              LVL.{isKanrishaurus ? "999+" : level}
             </div>
           </div>
           
@@ -147,7 +149,7 @@ export default function Home() {
           </div>
           
           <h2 className="font-display text-xl text-center mb-2 text-shadow-pixel text-accent uppercase tracking-tighter">
-            {isAlternate ? 'KANRISHAURUS' : (profile?.full_name || 'BRILLIANO D.U.')}
+            {isKanrishaurus ? 'KANRISHAURUS' : (profile?.full_name || 'BRILLIANO D.U.')}
           </h2>
           <p className="font-body text-2xl text-muted-foreground mb-6 uppercase tracking-widest border-b-2 border-muted pb-2 w-full text-center">
             Class: {profile?.class_name || 'Web Mage'}
@@ -155,21 +157,21 @@ export default function Home() {
 
           <div className="w-full space-y-4">
             <h3 className="font-display text-xs text-secondary mb-2 uppercase italic tracking-widest">
-              {isAlternate ? '- ALTERNATE STATS -' : '- ATTRIBUTES -'}
+              {isKanrishaurus ? '- ALTERNATE STATS -' : '- ATTRIBUTES -'}
             </h3>
             {[
               ...(stats || []),
-              ...(isAlternate ? [{ name: "Unique Skill", val: 100, color: "bg-primary" }] : [])
+              ...(isKanrishaurus ? [{ name: "Unique Skill", val: 100, color: "bg-primary" }] : [])
             ].map((stat: any) => (
               <div key={stat.name}>
                 <div className="flex justify-between font-body text-lg mb-1">
                   <span>{stat.name}</span>
-                  <span>{isAlternate ? "99+" : stat.val}</span>
+                  <span>{isKanrishaurus ? "99+" : stat.val}</span>
                 </div>
                 <div className="w-full h-3 bg-background border-2 border-white p-[1px]">
                   <div 
                     className={`h-full ${stat.color} transition-all duration-1000`} 
-                    style={{ width: `${isAlternate ? 100 : stat.val}%` }} 
+                    style={{ width: `${isKanrishaurus ? 100 : stat.val}%` }} 
                   />
                 </div>
               </div>
@@ -183,6 +185,38 @@ export default function Home() {
             <Download size={16} className="group-active:translate-y-1" />
             <span>LOOT CV ITEM</span>
           </button>
+
+          {/* Social Links Panel */}
+          {(profile?.github_url || profile?.linkedin_url) && (
+            <div className="mt-4 w-full flex gap-3">
+              {profile?.github_url && (
+                <button 
+                  onClick={() => {
+                    playButtonSound();
+                    window.open(profile.github_url, "_blank");
+                  }}
+                  className="flex-1 py-3 pixel-btn flex items-center justify-center gap-2 group bg-slate-800 border-slate-600 hover:bg-slate-700 transition-colors"
+                  title="Visit GitHub Profile"
+                >
+                  <Github size={16} className="group-hover:scale-110 transition-transform" />
+                  <span className="font-display text-[8px]">GITHUB</span>
+                </button>
+              )}
+              {profile?.linkedin_url && (
+                <button 
+                  onClick={() => {
+                    playButtonSound();
+                    window.open(profile.linkedin_url, "_blank");
+                  }}
+                  className="flex-1 py-3 pixel-btn flex items-center justify-center gap-2 group bg-blue-900 border-blue-700 hover:bg-blue-800 transition-colors"
+                  title="Visit LinkedIn Profile"
+                >
+                  <Linkedin size={16} className="group-hover:scale-110 transition-transform" />
+                  <span className="font-display text-[8px]">LINKEDIN</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Quick Tools */}
@@ -267,7 +301,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          <div className="mt-6 font-body text-xl text-muted-foreground opacity-60">
+          <div className="mt-6 font-body text-xl text-muted-foreground opacity-90">
             {profile?.bio || "I craft digital experiences with pixel-perfect precision. Specialized in React, modern CSS, and bringing creative concepts to life on the web canvas."}
           </div>
         </div>

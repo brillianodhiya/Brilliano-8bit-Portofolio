@@ -58,7 +58,7 @@ export default function Education() {
                 <div className={`w-full md:w-1/2 pixel-panel p-4 md:p-5 bg-background ${item.border} ml-10 md:ml-0`}>
                   <div className="font-display text-[10px] md:text-xs text-muted-foreground mb-2">{item.year}</div>
                   <h3 className={`font-display text-xs md:text-base mb-2 ${item.color} leading-relaxed md:leading-loose`}>{item.title}</h3>
-                  <div className="flex items-center gap-1 font-body text-base md:text-lg text-foreground mb-4 opacity-80">
+                  <div className="flex items-center gap-1 font-body text-base md:text-lg text-foreground mb-4 opacity-100">
                     <MapPin size={12} className="md:w-[14px] md:h-[14px]" /> {item.location}
                   </div>
                   <p className="font-body text-lg md:text-xl leading-snug text-muted-foreground">

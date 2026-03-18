@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
 import { Loader2 } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
+import { useTheme } from "@/context/ThemeContext";
+import { cn } from "@/lib/utils";
 
 interface Skill {
   id: string;
@@ -22,14 +24,13 @@ interface Category {
   border: string;
 }
 
-function StarBar({ level, max = 5 }: { level: number; max?: number }) {
+function StarBar({ level, max = 5, isBoss = false }: { level: number; max?: number, isBoss?: boolean }) {
   return (
     <div className="flex gap-1">
       {Array.from({ length: max }).map((_, i) => (
         <div
           key={i}
-          className="w-2 h-2 border border-white/50"
-          style={{ background: i < level ? "#ffd700" : "transparent" }}
+          className={cn("w-2 h-2 border border-white/50", isBoss ? (i < level ? "bg-red-600 shadow-[0_0_5px_#ff0000]" : "bg-transparent") : (i < level ? "bg-[#ffd700]" : "bg-transparent"))}
         />
       ))}
     </div>
@@ -37,6 +38,7 @@ function StarBar({ level, max = 5 }: { level: number; max?: number }) {
 }
 
 export function SkillTree() {
+  const { isKanrishaurus } = useTheme();
   const [selected, setSelected] = useState<Skill | null>(null);
   const [activeCategory, setActiveCategory] = useState("all");
 
@@ -61,8 +63,12 @@ export function SkillTree() {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="text-center">
-        <h2 className="font-display text-2xl md:text-3xl text-accent text-shadow-pixel mb-3">SKILL TREE</h2>
-        <p className="font-body text-xl text-muted-foreground">Abilities learned throughout the campaign.</p>
+        <h2 className="font-display text-2xl md:text-3xl text-accent text-shadow-pixel mb-3">
+          {isKanrishaurus ? "FORBIDDEN ABILITIES" : "SKILL TREE"}
+        </h2>
+        <p className="font-body text-xl text-muted-foreground uppercase">
+          {isKanrishaurus ? "Forbidden knowledge acquired from the dark realm." : "Abilities learned throughout the campaign."}
+        </p>
       </div>
 
       {/* Category filter */}
@@ -115,12 +121,12 @@ export function SkillTree() {
                 )}
               </div>
               <div className="font-display text-[8px] text-center leading-loose">{skill.name}</div>
-              <StarBar level={skill.level} />
+              <StarBar level={skill.level} isBoss={isKanrishaurus} />
               {!skill.unlocked && (
                 <div className="font-display text-[7px] text-gray-500">LOCKED</div>
               )}
               {cat && (
-                <div className={`font-display text-[6px] ${cat.color}`}>
+                <div className={cn("font-display text-[6px]", isKanrishaurus ? "text-red-500" : cat.color)}>
                   {cat.label.split(" ")[0]}
                 </div>
               )}
@@ -153,10 +159,10 @@ export function SkillTree() {
               <h3 className="font-display text-base text-center text-accent mb-2">{selected.name}</h3>
 
               <div className="flex justify-center mb-4">
-                <StarBar level={selected.level} />
+                <StarBar level={selected.level} isBoss={isKanrishaurus} />
               </div>
 
-              <div className="font-display text-[8px] text-muted-foreground text-center mb-3 uppercase">
+              <div className={cn("font-display text-[8px] text-center mb-3 uppercase", isKanrishaurus ? "text-red-500" : "text-muted-foreground")}>
                 {CATEGORIES.find(c => c.id === selected.category_id)?.label}
               </div>
 
