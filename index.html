@@ -26,6 +26,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <!-- SVG Pixelation Filter (hidden, referenced by CSS) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+      <defs>
+        <filter id="pixelate" x="0" y="0">
+          <feFlood x="1" y="1" height="1" width="1" />
+          <feComposite width="3" height="3" />
+          <feTile result="a" />
+          <feComposite in="SourceGraphic" in2="a" operator="in" />
+          <feMorphology operator="dilate" radius="1.5" />
+        </filter>
+      </defs>
+    </svg>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

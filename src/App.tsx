@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { Layout } from "@/components/Layout";
 import { MusicPlayer } from "@/components/MusicPlayer";
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 // Lazy loading pages for better performance (Code Splitting)
@@ -17,7 +17,41 @@ const Certifications = lazy(() => import("@/pages/Certifications"));
 const Gallery = lazy(() => import("@/pages/Gallery"));
 const Skills = lazy(() => import("@/pages/Skills"));
 const Experience = lazy(() => import("@/pages/Experience"));
+const SecretDungeon = lazy(() => import("@/pages/SecretDungeon"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+
+// Global Konami Code listener component
+import { useKonamiCode } from "@/hooks/use-konami-code";
+import { KeyViz } from "@/components/KeyViz";
+import { NesController } from "@/components/NesController";
+import { unlockAchievement } from "@/hooks/use-achievements";
+import { useLocation } from "wouter";
+import { closeNesController, getNesControllerOpen, subscribeNesController } from "@/lib/nes-controller-state";
+
+function KonamiCodeListener() {
+  const [, navigate] = useLocation();
+  const [isNesOpen, setIsNesOpen] = useState(false);
+
+  useEffect(() => {
+    return subscribeNesController(() => setIsNesOpen(getNesControllerOpen()));
+  }, []);
+
+  const { progress, total, keyPresses, isActive, processKey } = useKonamiCode(() => {
+    unlockAchievement("secret_dungeon");
+    const secretAudio = new Audio(`${import.meta.env.BASE_URL}secret_start.mp3`);
+    secretAudio.volume = 0.6;
+    secretAudio.play().catch(() => {});
+    closeNesController();
+    setTimeout(() => navigate("/secret-dungeon"), 600);
+  });
+
+  return (
+    <>
+      <KeyViz keyPresses={keyPresses} progress={progress} total={total} isActive={isActive} />
+      <NesController onButtonPress={processKey} progress={progress} total={total} isOpen={isNesOpen} />
+    </>
+  );
+}
 
 async function trackVisit() {
   if (!supabase) return;
@@ -68,10 +102,12 @@ function Router() {
           <Route path="/certifications" component={Certifications} />
           <Route path="/gallery" component={Gallery} />
           <Route path="/skills" component={Skills} />
+          <Route path="/secret-dungeon" component={SecretDungeon} />
           <Route component={NotFound} />
         </Switch>
       </Suspense>
       <MusicPlayer />
+      <KonamiCodeListener />
     </Layout>
   );
 }

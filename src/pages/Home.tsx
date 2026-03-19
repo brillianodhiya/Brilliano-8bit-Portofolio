@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Download, Terminal, Coffee, Code2, Cpu, Loader2, Github, Linkedin } from "lucide-react";
+import { Download, Terminal, Gamepad2, Code2, Cpu, Loader2, Github, Linkedin } from "lucide-react";
 import { CommitGraph } from "@/components/CommitGraph";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
@@ -10,6 +10,7 @@ import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
 
 import { useTheme } from "@/context/ThemeContext";
+import { toggleNesController } from "@/lib/nes-controller-state";
 
 export default function Home() {
   const { unlockAchievement } = useAchievements();
@@ -243,11 +244,14 @@ export default function Home() {
             <span className="font-display text-[8px]">SYS</span>
           </div>
           <div 
-            onClick={playButtonSound}
+            onClick={() => {
+              playButtonSound();
+              toggleNesController();
+            }}
             className="flex flex-col items-center gap-1 p-2 bg-background border-2 border-transparent hover:border-white transition-colors cursor-pointer"
           >
-            <Coffee size={20} className="text-destructive" />
-            <span className="font-display text-[8px]">FUEL</span>
+            <Gamepad2 size={20} className="text-destructive" />
+            <span className="font-display text-[8px]">CHEAT</span>
           </div>
         </div>
       </div>

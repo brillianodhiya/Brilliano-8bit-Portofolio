@@ -1,0 +1,224 @@
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { Sparkles, Youtube, Wrench, Gamepad2, Dice6, Lock, ArrowLeft, ExternalLink } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/context/ThemeContext";
+import { playButtonSound } from "@/lib/audio";
+import { useAchievements } from "@/hooks/use-achievements";
+import { SEO } from "@/components/SEO";
+import { useLocation } from "wouter";
+
+const YOUTUBE_CHANNELS = [
+  { name: "Pyroseus", url: "https://www.youtube.com/@pyroseus", desc: "Deep dives into fascinating topics", icon: "https://yt3.googleusercontent.com/s_Y67lCkWjNpAuvmb-sdDaSCEanEqRvlodmIjyXyIierG53sZlF3_6fMUnfGl__HvrWQ5-bykQ=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Windah Basudara", url: "https://www.youtube.com/@WindahBasudara", desc: "Gaming & entertainment legend", icon: "https://yt3.googleusercontent.com/ZM0JpQTkJn-wJ3OfOD_TLFPnI-uno1QrWz20JH_FBtWK1oUCq032OkHIHO4Rr27ul_czy8g6Xw=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Dunia Alam", url: "https://www.youtube.com/@Dunia_Alam", desc: "Exploring the wonders of nature", icon: "https://yt3.googleusercontent.com/zOWCoAVPooIkU1xaeq5kehrPB9nUDek61Qy-3gTBDoczliryW30UIBC0yG7mJ6Nj5JSjll6Mgg=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Belajar Dunia Purba", url: "https://www.youtube.com/@BelajarDuniaPurba", desc: "Journey into the prehistoric world", icon: "https://yt3.googleusercontent.com/ln6IaoBPZ5DLCMlrN3W-8aAZTNNfKcvx1M8auHw8eqoZFrNXdMhPe7wk2IZTmjs7tVq2q4SCl1o=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Dea Afrizal", url: "https://www.youtube.com/@deaafrizal", desc: "Tech reviews & digital lifestyle", icon: "https://yt3.googleusercontent.com/cKwv2BRMNSuGr6TUtEDqqdcY59bRfbrMHK86BAoadMD1R5LRzG4O-6A5MplEhyqAIxXdV9yh=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Fireship", url: "https://www.youtube.com/@Fireship", desc: "Fast-paced tech news & tutorials", icon: "https://yt3.googleusercontent.com/3fPNbkf_xPyCleq77ZhcxyeorY97NtMHVNUbaAON_RBDH9ydL4hJkjxC8x_4mpuopkB8oI7Ct6Y=s160-c-k-c0x00ffffff-no-rj" },
+];
+
+interface DungeonRoom {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  color: string;
+  border: string;
+  locked: boolean;
+  content?: React.ReactNode;
+}
+
+export default function SecretDungeon() {
+  const { isKanrishaurus } = useTheme();
+  const { unlockAchievement } = useAchievements();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    // Automatically unlock the achievement when visiting the secret dungeon
+    unlockAchievement("secret_dungeon");
+  }, [unlockAchievement]);
+
+  const rooms: DungeonRoom[] = [
+    {
+      id: "signal-tower",
+      title: "SIGNAL TOWER",
+      subtitle: "Channels that transmit forbidden knowledge",
+      icon: <Youtube size={28} />,
+      color: "text-red-400",
+      border: "border-red-500",
+      locked: false,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+          {YOUTUBE_CHANNELS.map((ch) => (
+            <a
+              key={ch.name}
+              href={ch.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={playButtonSound}
+              className="pixel-panel p-3 flex items-center gap-3 hover:border-red-400 transition-colors group bg-card/50"
+            >
+              <img src={ch.icon} alt={ch.name} className="w-10 h-10 flex-shrink-0 rounded-sm border-2 border-white/20 object-cover" />
+              <div className="flex-1 min-w-0">
+                <div className="font-display text-[9px] text-red-400 flex items-center gap-1 group-hover:text-red-300 transition-colors truncate">
+                  {ch.name}
+                  <ExternalLink size={9} className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="font-body text-sm text-muted-foreground leading-tight mt-0.5 line-clamp-2">{ch.desc}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "workshop",
+      title: "WORKSHOP",
+      subtitle: "Forge & craft legendary tools",
+      icon: <Wrench size={28} />,
+      color: "text-amber-400",
+      border: "border-amber-500",
+      locked: true,
+    },
+    {
+      id: "arcade",
+      title: "ARCADE",
+      subtitle: "Challenge ancient machines",
+      icon: <Gamepad2 size={28} />,
+      color: "text-green-400",
+      border: "border-green-500",
+      locked: true,
+    },
+    {
+      id: "summon-gate",
+      title: "SUMMON GATE",
+      subtitle: "Roll the cosmic dice",
+      icon: <Dice6 size={28} />,
+      color: "text-purple-400",
+      border: "border-purple-500",
+      locked: true,
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-5xl mx-auto flex flex-col gap-8 pb-12"
+    >
+      <SEO
+        title="Secret Dungeon | Hidden Chamber"
+        description="You've discovered the secret dungeon! Explore hidden rooms filled with inspiration, tools, games, and gacha."
+      />
+
+      {/* Back button */}
+      <button
+        onClick={() => { navigate("/hub"); playButtonSound(); }}
+        className="pixel-btn py-2 px-4 self-start flex items-center gap-2 text-sm"
+      >
+        <ArrowLeft size={14} /> ESCAPE DUNGEON
+      </button>
+
+      {/* Header */}
+      <div className="text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+          className="inline-block mb-4"
+        >
+          <div className="pixel-panel p-4 bg-background/50 border-accent animate-pulse">
+            <span className="text-4xl">🏰</span>
+          </div>
+        </motion.div>
+
+        <h1 className={cn(
+          "font-display text-3xl md:text-5xl text-shadow-pixel mb-3 flex items-center justify-center gap-3",
+          isKanrishaurus ? "text-red-500" : "text-accent"
+        )}>
+          <Sparkles className="text-yellow-400" />
+          {isKanrishaurus ? "FORBIDDEN CHAMBER" : "SECRET DUNGEON"}
+          <Sparkles className="text-yellow-400" />
+        </h1>
+
+        <p className="font-body text-2xl text-muted-foreground italic">
+          {isKanrishaurus
+            ? "You dare enter the inner sanctum..."
+            : "You've discovered a hidden passage! Explore the dungeon rooms below."}
+        </p>
+
+        <div className="font-display text-[8px] text-accent bg-accent/10 border border-accent/30 inline-block px-4 py-1 mt-4">
+          🏆 ACHIEVEMENT UNLOCKED: SECRET DUNGEON DISCOVERED
+        </div>
+      </div>
+
+      {/* Dungeon rooms */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {rooms.map((room, idx) => (
+          <motion.div
+            key={room.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 + idx * 0.15 }}
+            className={cn(
+              "pixel-panel p-0 overflow-hidden flex flex-col",
+              room.locked && "opacity-60 grayscale",
+              !room.locked && "md:col-span-2"
+            )}
+          >
+            {/* Room header */}
+            <div className={cn(
+              "p-4 border-b-4 flex items-center gap-3",
+              room.locked ? "border-gray-600" : "border-white",
+              room.locked ? "bg-muted/20" : "bg-card/50"
+            )}>
+              <div className={cn(
+                "w-12 h-12 pixel-panel flex items-center justify-center",
+                room.locked ? "text-gray-500 border-gray-600" : room.color
+              )}>
+                {room.locked ? <Lock size={20} /> : room.icon}
+              </div>
+              <div>
+                <h3 className={cn(
+                  "font-display text-sm text-shadow-pixel",
+                  room.locked ? "text-gray-500" : room.color
+                )}>
+                  {room.title}
+                </h3>
+                <p className="font-body text-base text-muted-foreground">
+                  {room.subtitle}
+                </p>
+              </div>
+            </div>
+
+            {/* Room content */}
+            <div className="p-4 flex-grow">
+              {room.locked ? (
+                <div className="h-32 flex flex-col items-center justify-center gap-3">
+                  <Lock size={24} className="text-gray-600" />
+                  <div className="font-display text-[8px] text-gray-500 border border-gray-600 px-3 py-1">
+                    COMING SOON — UNDER CONSTRUCTION
+                  </div>
+                  <div className="font-body text-sm text-gray-600 italic text-center">
+                    This dungeon room is being excavated...
+                  </div>
+                </div>
+              ) : (
+                room.content
+              )}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Footer hint */}
+      <div className="text-center mt-8">
+        <div className="inline-block pixel-panel border-accent p-4 animate-bounce">
+          <p className="font-display text-[10px] text-accent">
+            NEW ROOMS ARE BEING EXCAVATED... STAY TUNED!
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

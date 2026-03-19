@@ -12,7 +12,7 @@ const INITIAL_QUESTS = [
     id: 4, 
     text: "Find the hidden easter egg", 
     completed: false,
-    subAchievements: ["hidden_persona", "high_scorer", "legendary_hero", "reluctant_hero", "destiny_unavoidable", "music_skip", "dino_click", "dino_rawr"]
+    subAchievements: ["hidden_persona", "high_scorer", "legendary_hero", "reluctant_hero", "destiny_unavoidable", "music_skip", "dino_click", "dino_rawr", "secret_dungeon"]
   },
 ];
 

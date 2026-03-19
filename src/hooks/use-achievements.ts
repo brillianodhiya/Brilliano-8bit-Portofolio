@@ -20,6 +20,7 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
   { id: "music_skip", title: "Disc Jockey", description: "Skipped through the playlist.", unlocked: false },
   { id: "dino_click", title: "Dino Clicker", description: "Interacted with the Pixel Dino.", unlocked: false },
   { id: "dino_rawr", title: "Jurassic Park", description: "The Dino gave a mighty RAWRR!", unlocked: false },
+  { id: "secret_dungeon", title: "Secret Dungeon", description: "Discovered the hidden chamber via Konami Code!", unlocked: false },
 ];
 
 // We use a simple Zustand store (simulated with React state + Context in standard apps, but here we just use a basic observer pattern if Zustand isn't available. Wait, I didn't add zustand to requirements. I will implement a lightweight custom pub/sub or just use React Context if needed, but I'll write a simple custom hook using global state for ease).
