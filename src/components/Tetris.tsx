@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
-import { ArrowLeft, ArrowRight, ArrowDown, RotateCw, Play, Pause, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowDown, RotateCw, Play, Pause, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 import { setArcadeMode } from "@/lib/nes-controller-state";
 
 // --- Constants ---
@@ -48,8 +48,11 @@ export function Tetris() {
   const [gameOver, setGameOver] = useState(false);
   const [paused, setPaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const gameLoopRef = useRef<number | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const panStartPos = useRef<{ x: number; y: number } | null>(null);
   const speed = Math.max(MIN_SPEED, INITIAL_SPEED - (level - 1) * 100);
 
   // --- Game Logic ---
@@ -188,6 +191,25 @@ export function Tetris() {
     return () => { if (gameLoopRef.current) clearInterval(gameLoopRef.current); };
   }, [gameStarted, paused, gameOver, dropHandler, speed]);
 
+  const toggleFullscreen = () => {
+    if (!boardRef.current) return;
+    if (!document.fullscreenElement) {
+      boardRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
   const startGame = () => {
     setGrid(createEmptyGrid());
     setScore(0);
@@ -207,28 +229,66 @@ export function Tetris() {
     <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
       <div className="flex flex-col md:flex-row gap-8 items-start justify-center w-full">
         
-        {/* Left Panel: Info */}
-        <div className="flex flex-col gap-4 w-full md:w-32 order-2 md:order-1">
-          <div className="pixel-panel p-3 bg-secondary/10 overflow-hidden">
-            <h4 className="font-display text-[8px] text-secondary mb-2 whitespace-nowrap">SCORE</h4>
-            <p className="font-display text-lg truncate" title={score.toString()}>{score.toLocaleString()}</p>
+        {/* Info Panels: Top row on mobile, Left column on md */}
+        <div className="flex flex-row md:flex-col gap-2 md:gap-4 w-full md:w-32 order-1 md:order-1 justify-center md:justify-start">
+          <div className="pixel-panel p-2 md:p-3 bg-secondary/10 flex-1 md:flex-none min-w-[70px] overflow-hidden">
+            <h4 className="font-display text-[6px] md:text-[8px] text-secondary mb-1 md:mb-2 whitespace-nowrap uppercase">Score</h4>
+            <p className="font-display text-base md:text-lg truncate">{score.toLocaleString()}</p>
           </div>
-          <div className="pixel-panel p-3 bg-accent/10">
-            <h4 className="font-display text-[8px] text-accent mb-2">LINES</h4>
-            <p className="font-display text-xl">{lines}</p>
+          <div className="pixel-panel p-2 md:p-3 bg-accent/10 flex-1 md:flex-none min-w-[60px]">
+            <h4 className="font-display text-[6px] md:text-[8px] text-accent mb-1 md:mb-2 uppercase">Lines</h4>
+            <p className="font-display text-lg md:text-xl">{lines}</p>
           </div>
-          <div className="pixel-panel p-3 bg-primary/10">
-            <h4 className="font-display text-[8px] text-primary mb-2">LEVEL</h4>
-            <p className="font-display text-xl">{level}</p>
+          <div className="pixel-panel p-2 md:p-3 bg-primary/10 flex-1 md:flex-none min-w-[60px]">
+            <h4 className="font-display text-[6px] md:text-[8px] text-primary mb-1 md:mb-2 uppercase">Level</h4>
+            <p className="font-display text-lg md:text-xl">{level}</p>
           </div>
         </div>
 
         {/* Center: Main Game Board */}
-        <div className="relative order-1 md:order-2">
-          <div className="pixel-panel p-1 bg-[#1a1a1a] border-4 border-[#333] shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+        <div className="relative order-2 md:order-2 mx-auto touch-none" ref={boardRef}>
+          {/* Fullscreen Toggle */}
+          <button 
+            onClick={toggleFullscreen}
+            className="absolute top-2 right-2 p-2 bg-black/60 backdrop-blur-sm border border-white/10 rounded-sm text-white/50 hover:text-white hover:border-white/30 transition-all z-30 flex items-center gap-2 text-[8px] uppercase tracking-widest"
+          >
+            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />} 
+            {isFullscreen ? "Exit" : "Fullscreen"}
+          </button>
+
+          <motion.div 
+            onPanStart={(_, info) => {
+              if (gameOver || !gameStarted || paused) return;
+              panStartPos.current = { x: info.point.x, y: info.point.y };
+            }}
+            onPan={(_, info) => {
+              if (!panStartPos.current || gameOver || !gameStarted || paused) return;
+              const dx = info.point.x - panStartPos.current.x;
+              const dy = info.point.y - panStartPos.current.y;
+              
+              const threshold = 30;
+              if (Math.abs(dx) > threshold) {
+                move(dx > 0 ? 1 : -1, 0);
+                panStartPos.current.x = info.point.x;
+              }
+              if (dy > threshold) {
+                move(0, 1);
+                panStartPos.current.y = info.point.y;
+              }
+            }}
+            onTap={() => {
+              if (gameOver || !gameStarted || paused) return;
+              rotate(1);
+            }}
+            className="pixel-panel p-1 bg-[#1a1a1a] border-4 border-[#333] shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
+          >
             <div 
               className="grid gap-px bg-[#222]" 
-              style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`, width: 'clamp(200px, 40vw, 300px)' }}
+              style={{ 
+                gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`, 
+                width: 'min(75vw, 280px)', 
+                maxWidth: '100%' 
+              }}
             >
               {grid.map((row, y) => row.map((cell, x) => {
                 // Check if active piece is here
@@ -255,7 +315,7 @@ export function Tetris() {
                 );
               }))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Overlays */}
           <AnimatePresence>
@@ -301,21 +361,19 @@ export function Tetris() {
           </AnimatePresence>
         </div>
 
-        {/* Right Panel: Next Piece + Controls */}
+        {/* Side Panel: Next Piece + Controls */}
         <div className="flex flex-col gap-4 w-full md:w-40 order-3">
-          <div className="pixel-panel p-3 bg-background/50">
-            <h4 className="font-display text-[8px] text-muted-foreground mb-2 text-center uppercase">Next Piece</h4>
-            <div className="grid grid-cols-4 gap-px bg-background/20 p-2 mx-auto" style={{ width: '80px' }}>
+          
+          <div className="pixel-panel p-3 bg-background/50 hidden md:block">
+            <h4 className="font-display text-[8px] text-muted-foreground mb-2 text-center uppercase">Next</h4>
+            <div className="grid grid-cols-4 gap-px bg-background/20 p-2 mx-auto" style={{ width: '60px' }}>
               {Array.from({ length: 4 }).map((_, y) => 
                 Array.from({ length: 4 }).map((_, x) => {
                   const isPart = nextPiece.shape[y]?.[x] === 1;
                   return (
                     <div 
                       key={`${x}-${y}`} 
-                      className={cn(
-                        "aspect-square w-full",
-                        isPart ? nextPiece.color + " border" : "bg-transparent"
-                      )}
+                      className={cn("aspect-square w-full", isPart ? nextPiece.color + " border" : "bg-transparent")}
                     />
                   );
                 })
@@ -323,32 +381,42 @@ export function Tetris() {
             </div>
           </div>
 
-          {/* On-screen Controls (Mobile optimized) */}
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            <div />
-            <button onPointerDown={() => rotate(1)} className="pixel-btn p-3 flex justify-center bg-card">
-              <RotateCw size={18} />
-            </button>
-            <div />
-            <button onPointerDown={() => move(-1, 0)} className="pixel-btn p-3 flex justify-center bg-card">
-              <ArrowLeft size={18} />
-            </button>
-            <button onPointerDown={() => move(0, 1)} className="pixel-btn p-3 flex justify-center bg-card">
-              <ArrowDown size={18} />
-            </button>
-            <button onPointerDown={() => move(1, 0)} className="pixel-btn p-3 flex justify-center bg-card">
-              <ArrowRight size={18} />
-            </button>
-          </div>
+          {/* Standard Controls (Reverted to original cluster but cleaner) */}
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-3 gap-2 mx-auto">
+              <div />
+              <button onPointerDown={(e) => { e.stopPropagation(); rotate(1); }} className="pixel-btn p-3 flex justify-center bg-card active:scale-95 shadow-lg">
+                <RotateCw size={18} />
+              </button>
+              <div />
+              <button onPointerDown={(e) => { e.stopPropagation(); move(-1, 0); }} className="pixel-btn p-3 flex justify-center bg-card active:scale-95 shadow-lg">
+                <ArrowLeft size={18} />
+              </button>
+              <button onPointerDown={(e) => { e.stopPropagation(); move(0, 1); }} className="pixel-btn p-3 flex justify-center bg-card active:scale-95 shadow-lg">
+                <ArrowDown size={18} />
+              </button>
+              <button onPointerDown={(e) => { e.stopPropagation(); move(1, 0); }} className="pixel-btn p-3 flex justify-center bg-card active:scale-95 shadow-lg">
+                <ArrowRight size={18} />
+              </button>
+            </div>
 
-          <button 
-            onClick={togglePause} 
-            disabled={!gameStarted || gameOver}
-            className="pixel-btn p-3 flex items-center justify-center gap-2 text-[10px] bg-secondary/20 hover:bg-secondary/40"
-          >
-            {paused ? <Play size={14} /> : <Pause size={14} />} 
-            {paused ? "RESUME" : "PAUSE"}
-          </button>
+            <div className="flex justify-center gap-2">
+              <button 
+                onClick={togglePause} 
+                className="pixel-btn px-4 py-2 flex items-center justify-center gap-2 text-[8px] bg-secondary/20 hover:bg-secondary/40"
+              >
+                {paused ? <Play size={12} /> : <Pause size={12} />} 
+                {paused ? "RESUME" : "PAUSE"}
+              </button>
+              
+              <button 
+                onClick={toggleFullscreen}
+                className="pixel-btn p-2 md:hidden bg-accent/20"
+              >
+                <Maximize2 size={16} />
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
