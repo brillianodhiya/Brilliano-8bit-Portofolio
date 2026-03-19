@@ -87,7 +87,39 @@ export default function SecretDungeon() {
       icon: <Gamepad2 size={28} />,
       color: "text-green-400",
       border: "border-green-500",
-      locked: true,
+      locked: false,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+          {[
+            { id: 'tetris', name: 'TETRIS', icon: '🧱', desc: 'Classic block puzzle', path: '/arcade/tetris' },
+            { id: 'sudoku', name: 'SUDOKU', icon: '🔢', desc: 'Logic-based numbers', path: '/arcade/sudoku', comingSoon: true },
+            { id: 'snake', name: 'SNAKE', icon: '🐍', desc: 'Retro snake eater', path: '/arcade/snake', comingSoon: true },
+            { id: 'bubble', name: 'BUBBLE BLAST', icon: '🫧', desc: 'Pop the colorful bubbles', path: '/arcade/bubble', comingSoon: true },
+            { id: 'match3', name: 'CANDY MATCH', icon: '🍬', desc: 'Sweet matching puzzle', path: '/arcade/match3', comingSoon: true },
+            { id: 'shooter', name: 'SPACE SHOOTER', icon: '🚀', desc: 'Galactic combat', path: '/arcade/shooter', comingSoon: true },
+          ].map((game) => (
+            <button
+              key={game.id}
+              onClick={() => { if (!game.comingSoon) { navigate(game.path); playButtonSound(); } }}
+              className={cn(
+                "pixel-panel p-3 flex flex-col items-center text-center gap-2 transition-all group",
+                game.comingSoon ? "opacity-50 grayscale cursor-not-allowed" : "hover:border-green-400 hover:bg-green-400/5 cursor-pointer"
+              )}
+            >
+              <span className="text-3xl group-hover:scale-110 transition-transform">{game.icon}</span>
+              <div className="flex flex-col">
+                <span className="font-display text-[10px] text-green-400">{game.name}</span>
+                <span className="font-body text-[10px] text-muted-foreground leading-tight">{game.desc}</span>
+              </div>
+              {game.comingSoon && (
+                <div className="font-display text-[6px] bg-muted/20 px-2 py-0.5 mt-1 border border-white/10 uppercase">
+                  Coming Soon
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+      ),
     },
     {
       id: "summon-gate",
@@ -163,7 +195,7 @@ export default function SecretDungeon() {
             className={cn(
               "pixel-panel p-0 overflow-hidden flex flex-col",
               room.locked && "opacity-60 grayscale",
-              !room.locked && "md:col-span-2"
+              !room.locked && (room.id === 'signal-tower' || room.id === 'arcade') && "md:col-span-2"
             )}
           >
             {/* Room header */}

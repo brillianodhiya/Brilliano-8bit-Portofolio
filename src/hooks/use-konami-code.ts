@@ -27,7 +27,7 @@ export interface KeyPress {
 
 let pressIdCounter = 0;
 
-export function useKonamiCode(onSuccess: () => void) {
+export function useKonamiCode(onSuccess: () => void, options: { disabled?: boolean } = {}) {
   const [progress, setProgress] = useState<number>(0);
   const [keyPresses, setKeyPresses] = useState<KeyPress[]>([]);
   const [isActive, setIsActive] = useState<boolean>(false);
@@ -85,6 +85,7 @@ export function useKonamiCode(onSuccess: () => void) {
   // Keyboard listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (options.disabled) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       const isKonamiKey = KONAMI_CODE.includes(e.key) || KONAMI_CODE.includes(e.key.toLowerCase());

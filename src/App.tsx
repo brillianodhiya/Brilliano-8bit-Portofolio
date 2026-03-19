@@ -18,6 +18,12 @@ const Gallery = lazy(() => import("@/pages/Gallery"));
 const Skills = lazy(() => import("@/pages/Skills"));
 const Experience = lazy(() => import("@/pages/Experience"));
 const SecretDungeon = lazy(() => import("@/pages/SecretDungeon"));
+const ArcadeTetris = lazy(() => import("@/pages/ArcadeTetris"));
+const ArcadeSudoku = lazy(() => import("@/pages/ArcadeSudoku"));
+const ArcadeSnake = lazy(() => import("@/pages/ArcadeSnake"));
+const ArcadeBubble = lazy(() => import("@/pages/ArcadeBubble"));
+const ArcadeMatch3 = lazy(() => import("@/pages/ArcadeMatch3"));
+const ArcadeShooter = lazy(() => import("@/pages/ArcadeShooter"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Global Konami Code listener component
@@ -26,14 +32,21 @@ import { KeyViz } from "@/components/KeyViz";
 import { NesController } from "@/components/NesController";
 import { unlockAchievement } from "@/hooks/use-achievements";
 import { useLocation } from "wouter";
-import { closeNesController, getNesControllerOpen, subscribeNesController } from "@/lib/nes-controller-state";
+import { closeNesController, getNesControllerOpen, subscribeNesController, subscribeArcadeMode, getArcadeMode } from "@/lib/nes-controller-state";
 
 function KonamiCodeListener() {
   const [, navigate] = useLocation();
   const [isNesOpen, setIsNesOpen] = useState(false);
 
   useEffect(() => {
-    return subscribeNesController(() => setIsNesOpen(getNesControllerOpen()));
+    const unsub = subscribeNesController(() => setIsNesOpen(getNesControllerOpen()));
+    return () => { unsub(); };
+  }, []);
+
+  const [isArcadeMode, setIsArcadeMode] = useState(false);
+  useEffect(() => {
+    const unsub = subscribeArcadeMode(() => setIsArcadeMode(getArcadeMode()));
+    return () => { unsub(); };
   }, []);
 
   const { progress, total, keyPresses, isActive, processKey } = useKonamiCode(() => {
@@ -43,7 +56,7 @@ function KonamiCodeListener() {
     secretAudio.play().catch(() => {});
     closeNesController();
     setTimeout(() => navigate("/secret-dungeon"), 600);
-  });
+  }, { disabled: isArcadeMode });
 
   return (
     <>
@@ -103,6 +116,12 @@ function Router() {
           <Route path="/gallery" component={Gallery} />
           <Route path="/skills" component={Skills} />
           <Route path="/secret-dungeon" component={SecretDungeon} />
+          <Route path="/arcade/tetris" component={ArcadeTetris} />
+          <Route path="/arcade/sudoku" component={ArcadeSudoku} />
+          <Route path="/arcade/snake" component={ArcadeSnake} />
+          <Route path="/arcade/bubble" component={ArcadeBubble} />
+          <Route path="/arcade/match3" component={ArcadeMatch3} />
+          <Route path="/arcade/shooter" component={ArcadeShooter} />
           <Route component={NotFound} />
         </Switch>
       </Suspense>
