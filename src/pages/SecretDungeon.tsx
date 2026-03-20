@@ -71,15 +71,7 @@ export default function SecretDungeon() {
         </div>
       ),
     },
-    {
-      id: "workshop",
-      title: "WORKSHOP",
-      subtitle: "Forge & craft legendary tools",
-      icon: <Wrench size={28} />,
-      color: "text-amber-400",
-      border: "border-amber-500",
-      locked: true,
-    },
+
     {
       id: "arcade",
       title: "ARCADE",
@@ -122,13 +114,69 @@ export default function SecretDungeon() {
       ),
     },
     {
+      id: "workshop",
+      title: "WORKSHOP",
+      subtitle: "Ancient craftsman tools",
+      icon: <Wrench size={28} />,
+      color: "text-blue-400",
+      border: "border-blue-500",
+      locked: false,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+          {[
+            { id: 'yt', name: 'YT DOWNLOADER', icon: '📥', desc: 'YouTube to MP3/Video', path: '/workshop/youtube' },
+            { id: 'board', name: 'WHITEBOARD', icon: '🎨', desc: 'Infinite drawing canvas', path: '/workshop/whiteboard' },
+            { id: 'color', name: 'COLOR PALETTE', icon: '🌈', desc: 'Design inspiration', path: '/workshop/color' },
+            { id: 'mermaid', name: 'MERMAID VIEW', icon: '📊', desc: 'Diagram renderer', path: '/workshop/mermaid' },
+            { id: 'bg', name: 'BG REMOVER', icon: '🖼️', desc: 'Remove image background', path: '/workshop/bg-remover' },
+            { id: 'sprite', name: 'SPRITE CUTTER', icon: '✂️', desc: 'Sprite to GIF animator', path: '/workshop/sprite' },
+            { id: 'pdf', name: 'PDF EDITOR', icon: '📄', desc: 'Edit and annotate PDFs', path: '/workshop/pdf' },
+          ].map((tool) => (
+            <button
+              key={tool.id}
+              onClick={() => { navigate(tool.path); playButtonSound(); }}
+              className="pixel-panel p-3 flex flex-col items-center text-center gap-2 transition-all group hover:border-blue-400 hover:bg-blue-400/5 cursor-pointer"
+            >
+              <span className="text-3xl group-hover:scale-110 transition-transform">{tool.icon}</span>
+              <div className="flex flex-col">
+                <span className="font-display text-[10px] text-blue-400">{tool.name}</span>
+                <span className="font-body text-[10px] text-muted-foreground leading-tight">{tool.desc}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      ),
+    },
+    {
       id: "summon-gate",
       title: "SUMMON GATE",
       subtitle: "Roll the cosmic dice",
       icon: <Dice6 size={28} />,
       color: "text-purple-400",
       border: "border-purple-500",
-      locked: true,
+      locked: false,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+          {[
+            { id: 'uma', name: 'UMA MUSUME', icon: '🐎', desc: 'Summon legendary horse girls', path: '/summon/uma' },
+            { id: 'girls', name: 'ANIME GIRLS', icon: '✨', desc: 'Summon beautiful anime girls', path: '/summon/girls' },
+            { id: 'boys', name: 'ANIME BOYS', icon: '🔥', desc: 'Summon cool anime boys', path: '/summon/boys' },
+            { id: 'collection', name: 'COLLECTION', icon: '🗃️', desc: 'View your neural inventory', path: '/secret-dungeon/collection' },
+          ].map((summon) => (
+            <button
+              key={summon.id}
+              onClick={() => { navigate(summon.path); playButtonSound(); }}
+              className="pixel-panel p-4 flex flex-col items-center text-center gap-3 transition-all group hover:border-purple-400 hover:bg-purple-400/5 cursor-pointer"
+            >
+              <span className="text-4xl group-hover:scale-110 transition-transform">{summon.icon}</span>
+              <div className="flex flex-col">
+                <span className="font-display text-[10px] text-purple-400">{summon.name}</span>
+                <span className="font-body text-[10px] text-muted-foreground leading-tight">{summon.desc}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      ),
     },
   ];
 
@@ -185,58 +233,76 @@ export default function SecretDungeon() {
       </div>
 
       {/* Dungeon rooms */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {rooms.map((room, idx) => (
           <motion.div
             key={room.id}
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 + idx * 0.15 }}
+            whileHover={{ 
+              scale: 1.02, 
+              rotateX: room.id === 'arcade' || room.id === 'signal-tower' ? 0.5 : 1, 
+              rotateY: room.id === 'arcade' || room.id === 'signal-tower' ? 0.5 : 1,
+              transition: { duration: 0.2 } 
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ delay: 0.3 + idx * 0.1 }}
             className={cn(
-              "pixel-panel p-0 overflow-hidden flex flex-col",
-              room.locked && "opacity-60 grayscale",
+              "pixel-panel p-0 overflow-hidden flex flex-col transition-shadow hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)]",
+              room.locked && "opacity-60 grayscale cursor-not-allowed",
               !room.locked && (room.id === 'signal-tower' || room.id === 'arcade') && "md:col-span-2"
             )}
           >
             {/* Room header */}
             <div className={cn(
-              "p-4 border-b-4 flex items-center gap-3",
+              "p-5 border-b-4 flex items-center justify-between",
               room.locked ? "border-gray-600" : "border-white",
               room.locked ? "bg-muted/20" : "bg-card/50"
             )}>
-              <div className={cn(
-                "w-12 h-12 pixel-panel flex items-center justify-center",
-                room.locked ? "text-gray-500 border-gray-600" : room.color
-              )}>
-                {room.locked ? <Lock size={20} /> : room.icon}
+              <div className="flex items-center gap-4">
+                <motion.div 
+                  initial={{ rotate: -10 }}
+                  whileHover={{ rotate: 10 }}
+                  className={cn(
+                    "w-12 h-12 pixel-panel flex items-center justify-center shadow-lg",
+                    room.locked ? "text-gray-500 border-gray-600" : room.color
+                  )}
+                >
+                  {room.locked ? <Lock size={20} /> : room.icon}
+                </motion.div>
+                <div>
+                  <h3 className={cn(
+                    "font-display text-sm text-shadow-pixel tracking-widest",
+                    room.locked ? "text-gray-500" : room.color
+                  )}>
+                    {room.title}
+                  </h3>
+                  <p className="font-body text-base text-muted-foreground italic">
+                    {room.subtitle}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className={cn(
-                  "font-display text-sm text-shadow-pixel",
-                  room.locked ? "text-gray-500" : room.color
-                )}>
-                  {room.title}
-                </h3>
-                <p className="font-body text-base text-muted-foreground">
-                  {room.subtitle}
-                </p>
-              </div>
+              {!room.locked && <Sparkles className="text-yellow-400 opacity-20 group-hover:opacity-100 transition-opacity" size={16} />}
             </div>
 
             {/* Room content */}
-            <div className="p-4 flex-grow">
+            <div className="p-4 flex-grow relative">
               {room.locked ? (
                 <div className="h-32 flex flex-col items-center justify-center gap-3">
-                  <Lock size={24} className="text-gray-600" />
-                  <div className="font-display text-[8px] text-gray-500 border border-gray-600 px-3 py-1">
+                  <Lock size={24} className="text-gray-600 opacity-20" />
+                  <div className="font-display text-[8px] text-gray-500 border border-gray-600/30 px-3 py-1">
                     COMING SOON — UNDER CONSTRUCTION
-                  </div>
-                  <div className="font-body text-sm text-gray-600 italic text-center">
-                    This dungeon room is being excavated...
                   </div>
                 </div>
               ) : (
-                room.content
+                <motion.div
+                   drag={room.id === 'arcade' || room.id === 'workshop' ? "x" : false}
+                   dragConstraints={{ left: -100, right: 100 }}
+                   dragElastic={0.1}
+                   className="cursor-grab active:cursor-grabbing"
+                >
+                   {room.content}
+                </motion.div>
               )}
             </div>
           </motion.div>

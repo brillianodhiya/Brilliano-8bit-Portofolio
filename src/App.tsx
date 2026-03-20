@@ -24,6 +24,17 @@ const ArcadeSnake = lazy(() => import("@/pages/ArcadeSnake"));
 const ArcadeBubble = lazy(() => import("@/pages/ArcadeBubble"));
 const ArcadeMatch3 = lazy(() => import("@/pages/ArcadeMatch3"));
 const ArcadeShooter = lazy(() => import("@/pages/ArcadeShooter"));
+const WorkshopYouTube = lazy(() => import("@/pages/WorkshopYouTube"));
+const WorkshopWhiteboard = lazy(() => import("@/pages/WorkshopWhiteboard"));
+const WorkshopColor = lazy(() => import("@/pages/WorkshopColor"));
+const WorkshopMermaid = lazy(() => import("@/pages/WorkshopMermaid"));
+const WorkshopBGRemover = lazy(() => import("@/pages/WorkshopBGRemover"));
+const WorkshopSprite = lazy(() => import("@/pages/WorkshopSprite"));
+const WorkshopPDF = lazy(() => import("@/pages/WorkshopPDF"));
+const SummonUma = lazy(() => import("@/pages/SummonUma"));
+const SummonGirls = lazy(() => import("@/pages/SummonGirls"));
+const SummonBoys = lazy(() => import("@/pages/SummonBoys"));
+const GachaCollection = lazy(() => import("@/pages/GachaCollection"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Global Konami Code listener component
@@ -122,6 +133,21 @@ function Router() {
           <Route path="/arcade/bubble" component={ArcadeBubble} />
           <Route path="/arcade/match3" component={ArcadeMatch3} />
           <Route path="/arcade/shooter" component={ArcadeShooter} />
+          
+          {/* Workshop Routes */}
+          <Route path="/workshop/youtube" component={WorkshopYouTube} />
+          <Route path="/workshop/whiteboard" component={WorkshopWhiteboard} />
+          <Route path="/workshop/color" component={WorkshopColor} />
+          <Route path="/workshop/mermaid" component={WorkshopMermaid} />
+          <Route path="/workshop/bg-remover" component={WorkshopBGRemover} />
+          <Route path="/workshop/sprite" component={WorkshopSprite} />
+          <Route path="/workshop/pdf" component={WorkshopPDF} />
+          
+          {/* Summon Gate Routes */}
+          <Route path="/summon/uma" component={SummonUma} />
+          <Route path="/summon/girls" component={SummonGirls} />
+          <Route path="/summon/boys" component={SummonBoys} />
+          <Route path="/secret-dungeon/collection" component={GachaCollection} />
           <Route component={NotFound} />
         </Switch>
       </Suspense>

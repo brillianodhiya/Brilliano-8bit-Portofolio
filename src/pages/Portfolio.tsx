@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ExternalLink, Github, Shield, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -141,168 +141,134 @@ export default function Portfolio() {
 
       <AnimatePresence>
         {selected && (
-          <div 
-            className="fixed inset-0 z-[9999] flex items-start justify-center p-2 md:p-4 bg-background/90 backdrop-blur-md cursor-pointer overflow-y-auto pt-20 pb-10"
-            onClick={() => {
-              setSelected(null);
-              playButtonSound();
-            }}
-          >
-            {/* Mobile-Fixed Close Button (Persistent while scrolling) */}
+          <div className="fixed inset-0 z-[10000]">
+            {/* Mobile-only Universal Close Button (Pinned to Viewport) */}
             <button 
               onClick={(e) => {
                 e.stopPropagation();
                 setSelected(null);
                 playButtonSound();
               }}
-              className="fixed top-6 right-6 w-12 h-12 pixel-btn bg-destructive flex items-center justify-center z-[10000] md:hidden shadow-2xl scale-110 active:scale-95 transition-transform"
+              className="!fixed top-6 right-6 w-14 h-14 pixel-btn !bg-destructive flex items-center justify-center z-[10010] md:hidden shadow-2xl active:scale-95 transition-transform"
             >
-              <X size={24} className="text-white" />
+              <X size={28} className="text-white" />
             </button>
 
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className={`pixel-panel max-w-4xl w-full p-0 flex flex-col md:flex-row relative cursor-default ${selected.color} my-4 md:my-8`}
-            >
-              {/* Desktop-only Close Button */}
-              <button 
+            {/* Backdrop & Scroll Layer */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Static Backdrop with Blur (Doesn't Scroll) */}
+              <div 
+                className="absolute inset-0 bg-background/90 backdrop-blur-sm cursor-pointer"
                 onClick={() => {
                   setSelected(null);
                   playButtonSound();
                 }}
-                className="hidden md:flex absolute -top-4 -right-4 w-10 h-10 pixel-btn bg-destructive items-center justify-center z-50 hover:scale-110 transition-transform"
+              />
+
+              {/* Scrolling Content Layer */}
+              <div 
+                className="absolute inset-0 overflow-y-auto pt-20 pb-10 px-2 md:px-4 cursor-pointer"
+                onClick={() => {
+                  setSelected(null);
+                  playButtonSound();
+                }}
               >
-                <X size={20} className="text-white" />
-              </button>
+                <div className="flex justify-center min-h-full items-start">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`pixel-panel max-w-4xl w-full p-0 flex flex-col md:flex-row relative cursor-default ${selected.color} my-4 md:my-8`}
+                  >
+                    {/* Desktop-only Close Button (Attached to panel) */}
+                    <button 
+                      onClick={() => {
+                        setSelected(null);
+                        playButtonSound();
+                      }}
+                      className="hidden md:flex absolute -top-4 -right-4 w-10 h-10 pixel-btn !bg-destructive items-center justify-center z-[110] hover:scale-110 transition-transform shadow-2xl"
+                    >
+                      <X size={20} className="text-white" />
+                    </button>
 
-              <div className="w-full md:w-2/5 bg-background p-6 flex flex-col items-center justify-center border-b-4 md:border-b-0 md:border-r-4 border-white relative group/modal min-h-[300px]">
-                 {/* Carousel Controls */}
-                 {selected.images.length > 1 && (
-                   <>
-                     <button 
-                       onClick={prevImage}
-                       className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
-                     >
-                       <ChevronLeft size={16} />
-                     </button>
-                     <button 
-                       onClick={nextImage}
-                       className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
-                     >
-                       <ChevronRight size={16} />
-                     </button>
-                     <div className="absolute top-2 left-2 font-display text-[8px] text-primary bg-background/80 px-2 py-1 border border-primary z-20">
-                       {currentImageIdx + 1}/{selected.images.length}
-                     </div>
-                   </>
-                 )}
+                    <div className="w-full md:w-2/5 bg-background p-6 flex flex-col items-center justify-center border-b-4 md:border-b-0 md:border-r-4 border-white relative group/modal min-h-[300px]">
+                      {/* Carousel Controls */}
+                      {selected.images.length > 1 && (
+                        <>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                            className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                          >
+                            <ChevronLeft size={16} />
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pixel-btn flex items-center justify-center z-20 md:opacity-0 group-hover/modal:opacity-100 transition-opacity bg-primary/80"
+                          >
+                            <ChevronRight size={16} />
+                          </button>
+                          <div className="absolute top-2 left-2 font-display text-[8px] text-primary bg-background/80 px-2 py-1 border border-primary z-20">
+                            {currentImageIdx + 1}/{selected.images.length}
+                          </div>
+                        </>
+                      )}
 
-                 <div 
-                   className="relative cursor-zoom-in group/img"
-                   onClick={() => {
-                     playButtonSound();
-                     window.open(getImageUrl(selected.images[currentImageIdx]), "_blank");
-                   }}
-                 >
-                   <AnimatePresence mode="wait">
-                     <motion.div
-                       key={currentImageIdx}
-                       initial={{ opacity: 0, scale: 0.95 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       exit={{ opacity: 0, scale: 1.05 }}
-                       className="pixel-img-frame w-full max-h-[250px] md:max-h-[350px] overflow-hidden"
-                     >
-                       <img 
-                         src={getImageUrl(selected.images[currentImageIdx])} 
-                         alt={selected.title}
-                         className="w-full h-full object-contain rendering-pixelated animate-float"
-                       />
-                     </motion.div>
-                   </AnimatePresence>
-                   <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
-                      <ExternalLink size={24} className="text-white drop-shadow-md" />
-                   </div>
-                 </div>
+                      <div className="relative cursor-zoom-in group/img" onClick={() => { playButtonSound(); window.open(getImageUrl(selected.images[currentImageIdx]), "_blank"); }}>
+                        <AnimatePresence mode="wait">
+                          <motion.div key={currentImageIdx} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }} className="pixel-img-frame w-full max-h-[250px] md:max-h-[350px] overflow-hidden">
+                            <img src={getImageUrl(selected.images[currentImageIdx])} alt={selected.title} className="w-full h-full object-contain rendering-pixelated animate-float" />
+                          </motion.div>
+                        </AnimatePresence>
+                        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                          <ExternalLink size={24} className="text-white drop-shadow-md" />
+                        </div>
+                      </div>
 
-                 <div className={cn(
-                   "font-display text-[10px] text-center px-3 py-1 border-2 mt-auto",
-                   getStatusStyles(selected.status)
-                 )}>
-                   STATUS: {selected.status}
-                 </div>
-              </div>
-
-              <div className="w-full md:w-3/5 p-6 flex flex-col">
-                <h2 className="font-display text-xl text-foreground text-shadow-pixel mb-1">{selected.title}</h2>
-                <div className="flex gap-2 items-center mb-6">
-                  <span className="font-display text-[8px] text-secondary uppercase bg-secondary/10 px-2 py-0.5 border border-secondary/20">
-                    {selected.type}
-                  </span>
-                  <span className="font-display text-[8px] text-accent uppercase bg-accent/10 px-2 py-0.5 border border-accent/20">
-                    🏢 {selected.company}
-                  </span>
-                </div>
-                
-                <p className="font-body text-2xl leading-tight mb-6 flex-grow">
-                  {selected.desc}
-                </p>
-
-                <div className="mb-6">
-                  <h4 className="font-display text-[10px] text-muted-foreground mb-2">EQUIPPED GEAR:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selected.tech.map((t: string) => (
-                      <span key={t} className="font-body text-lg px-2 bg-background border border-white text-foreground">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-4 mt-auto">
-                  {(!selected.demoUrl?.trim() && !selected.githubUrl?.trim()) ? (
-                    <div className="pixel-panel bg-destructive/10 border-destructive p-4 flex flex-col items-center gap-2">
-                       <Shield size={24} className="text-destructive animate-pulse" />
-                       <span className="font-display text-[10px] text-destructive">CONFIDENTIAL SOURCE</span>
-                       <p className="font-body text-sm text-center text-muted-foreground">
-                         This is a private company application. Source code and live demo are restricted due to NDA/Confidentiality.
-                       </p>
+                      <div className={cn("font-display text-[10px] text-center px-3 py-1 border-2 mt-auto", getStatusStyles(selected.status))}>
+                        STATUS: {selected.status}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex gap-4">
-                      <button 
-                        onClick={() => {
-                          playButtonSound();
-                          if (selected.demoUrl?.trim()) window.open(selected.demoUrl, "_blank");
-                        }}
-                        className={cn(
-                          "pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2",
-                          selected.demoUrl?.trim() ? "bg-primary" : "bg-gray-700 opacity-50 cursor-not-allowed"
+
+                    <div className="w-full md:w-3/5 p-6 flex flex-col">
+                      <h2 className="font-display text-xl text-foreground text-shadow-pixel mb-1">{selected.title}</h2>
+                      <div className="flex gap-2 items-center mb-6">
+                        <span className="font-display text-[8px] text-secondary uppercase bg-secondary/10 px-2 py-0.5 border border-secondary/20">{selected.type}</span>
+                        <span className="font-display text-[8px] text-accent uppercase bg-accent/10 px-2 py-0.5 border border-accent/20">🏢 {selected.company}</span>
+                      </div>
+                      
+                      <p className="font-body text-2xl leading-tight mb-6 flex-grow">{selected.desc}</p>
+
+                      <div className="mb-6">
+                        <h4 className="font-display text-[10px] text-muted-foreground mb-2">EQUIPPED GEAR:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selected.tech.map((t: string) => <span key={t} className="font-body text-lg px-2 bg-background border border-white text-foreground">{t}</span>)}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-4 mt-auto">
+                        {(!selected.demoUrl?.trim() && !selected.githubUrl?.trim()) ? (
+                          <div className="pixel-panel bg-destructive/10 border-destructive p-4 flex flex-col items-center gap-2">
+                            <Shield size={24} className="text-destructive animate-pulse" />
+                            <span className="font-display text-[10px] text-destructive">CONFIDENTIAL SOURCE</span>
+                            <p className="font-body text-sm text-center text-muted-foreground">This is a private company application. Source code and live demo are restricted due to NDA/Confidentiality.</p>
+                          </div>
+                        ) : (
+                          <div className="flex gap-4">
+                            <button onClick={() => { playButtonSound(); if (selected.demoUrl?.trim()) window.open(selected.demoUrl, "_blank"); }} className={cn("pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2", selected.demoUrl?.trim() ? "bg-primary" : "bg-gray-700 opacity-50 cursor-not-allowed")} disabled={!selected.demoUrl?.trim()}>
+                              <ExternalLink size={16} /> LIVE DEMO
+                            </button>
+                            <button onClick={() => { playButtonSound(); if (selected.githubUrl?.trim()) window.open(selected.githubUrl, "_blank"); }} className={cn("pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2", selected.githubUrl?.trim() ? "bg-card" : "bg-gray-700 opacity-50 cursor-not-allowed")} disabled={!selected.githubUrl?.trim()}>
+                              <Github size={16} /> SOURCE
+                            </button>
+                          </div>
                         )}
-                        disabled={!selected.demoUrl?.trim()}
-                      >
-                        <ExternalLink size={16} /> LIVE DEMO
-                      </button>
-                      <button 
-                        onClick={() => {
-                          playButtonSound();
-                          if (selected.githubUrl?.trim()) window.open(selected.githubUrl, "_blank");
-                        }}
-                        className={cn(
-                          "pixel-btn py-3 px-4 flex-1 flex justify-center items-center gap-2",
-                          selected.githubUrl?.trim() ? "bg-card" : "bg-gray-700 opacity-50 cursor-not-allowed"
-                        )}
-                        disabled={!selected.githubUrl?.trim()}
-                      >
-                        <Github size={16} /> SOURCE
-                      </button>
+                      </div>
                     </div>
-                  )}
+                  </motion.div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
       </AnimatePresence>

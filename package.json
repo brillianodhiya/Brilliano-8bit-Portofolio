@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
     "@supabase/supabase-js": "^2.45.0",
     "axios": "^1.13.6",
     "framer-motion": "12.35.1",
+    "gifshot": "^0.4.5",
     "lucide-react": "0.545.0",
+    "mermaid": "^11.13.0",
+    "pdf-lib": "^1.17.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "wouter": "^3.3.5"
