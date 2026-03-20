@@ -158,9 +158,9 @@ export default function SecretDungeon() {
       content: (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
           {[
-            { id: 'uma', name: 'UMA MUSUME', icon: '🐎', desc: 'Summon legendary horse girls', path: '/summon/uma' },
-            { id: 'girls', name: 'ANIME GIRLS', icon: '✨', desc: 'Summon beautiful anime girls', path: '/summon/girls' },
-            { id: 'boys', name: 'ANIME BOYS', icon: '🔥', desc: 'Summon cool anime boys', path: '/summon/boys' },
+            { id: 'uma', name: 'UMA MUSUME', icon: <img src="https://play-lh.googleusercontent.com/DRLSq9EkBBHQS77fGQv7vL1EH6a8ABLbRaqc6MIQf-XBDvmX9SBnkoEVEMHEyPqEbQiZ" className="w-12 h-12 rounded-sm border border-white/10 mx-auto" />, desc: 'Summon legendary horse girls', path: '/summon/uma' },
+            { id: 'girls', name: 'ANIME GIRLS', icon: <img src="https://images.squarespace-cdn.com/content/v1/65f4d9aad4c5d6603981303c/856124d5-920f-4d6a-9435-c19eeca4f9a2/aqua%2Bkonosuba%2Btop%2B10%2Banime%2Bgirls%2B2020.jpg" className="w-12 h-12 rounded-sm border border-white/10 mx-auto object-cover" />, desc: 'Summon beautiful anime girls', path: '/summon/girls' },
+            { id: 'boys', name: 'ANIME BOYS', icon: <img src="https://imgix.ranker.com/user_node_img/4373/87455191/original/satoru-gojo-u-2029987413?auto=format&q=60&fit=crop&fm=pjpg&dpr=2&w=355" className="w-12 h-12 rounded-sm border border-white/10 mx-auto object-cover" />, desc: 'Summon cool anime boys', path: '/summon/boys' },
             { id: 'collection', name: 'COLLECTION', icon: '🗃️', desc: 'View your neural inventory', path: '/secret-dungeon/collection' },
           ].map((summon) => (
             <button
@@ -168,7 +168,7 @@ export default function SecretDungeon() {
               onClick={() => { navigate(summon.path); playButtonSound(); }}
               className="pixel-panel p-4 flex flex-col items-center text-center gap-3 transition-all group hover:border-purple-400 hover:bg-purple-400/5 cursor-pointer"
             >
-              <span className="text-4xl group-hover:scale-110 transition-transform">{summon.icon}</span>
+              <span className="group-hover:scale-110 transition-transform">{summon.icon}</span>
               <div className="flex flex-col">
                 <span className="font-display text-[10px] text-purple-400">{summon.name}</span>
                 <span className="font-body text-[10px] text-muted-foreground leading-tight">{summon.desc}</span>

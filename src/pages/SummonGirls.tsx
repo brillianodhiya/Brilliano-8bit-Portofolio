@@ -111,10 +111,11 @@ export default function SummonGirls() {
             "The Waifu Network spans countless worlds. Each summon pulls a unique digital soul into our realm. Cherish your discoveries."
           </p>
         </div>
-        <div className="pixel-panel p-4 bg-background/50 border-pink-400/20 flex items-center justify-center">
+        <div className="pixel-panel p-4 bg-background/50 border-pink-400/20 flex flex-col items-center justify-center gap-3">
+          <img src="https://images.squarespace-cdn.com/content/v1/65f4d9aad4c5d6603981303c/856124d5-920f-4d6a-9435-c19eeca4f9a2/aqua%2Bkonosuba%2Btop%2B10%2Banime%2Bgirls%2B2020.jpg" className="w-20 h-20 rounded-xl border-2 border-pink-500/50 object-cover shadow-[0_0_20px_rgba(236,72,153,0.3)] animate-float" alt="Aqua" />
           <div className="flex flex-col items-center">
-            <Heart className="text-pink-500 fill-pink-500/20 animate-pulse" size={32} />
-            <span className="font-display text-[10px] mt-2 uppercase tracking-widest text-muted-foreground">Love & Resonance</span>
+            <Heart className="text-pink-500 fill-pink-500/20 animate-pulse" size={24} />
+            <span className="font-display text-[10px] mt-1 uppercase tracking-widest text-muted-foreground">Love & Resonance</span>
           </div>
         </div>
       </div>

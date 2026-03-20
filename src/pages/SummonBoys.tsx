@@ -101,10 +101,11 @@ export default function SummonBoys() {
             "The Husbando Abyss is deep and full of surprises. From warriors to scholars, each pull brings a unique presence to our realm."
           </p>
         </div>
-        <div className="pixel-panel p-4 bg-background/50 border-blue-400/20 flex items-center justify-center">
+        <div className="pixel-panel p-4 bg-background/50 border-blue-400/20 flex flex-col items-center justify-center gap-3">
+          <img src="https://imgix.ranker.com/user_node_img/4373/87455191/original/satoru-gojo-u-2029987413?auto=format&q=60&fit=crop&fm=pjpg&dpr=2&w=355" className="w-20 h-20 rounded-xl border-2 border-blue-500/50 object-cover shadow-[0_0_20px_rgba(59,130,246,0.3)] animate-float" alt="Gojo" />
           <div className="flex flex-col items-center">
-            <Zap className="text-blue-500 fill-blue-500/20 animate-bounce" size={32} />
-            <span className="font-display text-[10px] mt-2 uppercase tracking-widest text-muted-foreground">Power & Resonance</span>
+            <Zap className="text-blue-500 fill-blue-500/20 animate-bounce" size={24} />
+            <span className="font-display text-[10px] mt-1 uppercase tracking-widest text-muted-foreground">Power & Resonance</span>
           </div>
         </div>
       </div>

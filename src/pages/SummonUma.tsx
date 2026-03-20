@@ -108,11 +108,14 @@ export default function SummonUma() {
               <span className="font-display tracking-[0.2em] text-xs">EXIT TO GATE</span>
             </button>
           </Link>
-          <div className="text-right border-r-4 border-yellow-500 pr-6">
-             <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-100 via-yellow-400 to-yellow-600 bg-clip-text text-transparent italic tracking-tighter">
-               UMA MUSUME
-             </h1>
-             <p className="text-[10px] text-gray-500 font-display tracking-[0.3em] mt-1 leading-none">PRETTY DERBY - SUMMON GATE</p>
+          <div className="flex items-center gap-6 text-right border-r-4 border-yellow-500 pr-6">
+             <img src="https://play-lh.googleusercontent.com/DRLSq9EkBBHQS77fGQv7vL1EH6a8ABLbRaqc6MIQf-XBDvmX9SBnkoEVEMHEyPqEbQiZ" className="w-16 h-16 rounded-2xl shadow-2xl border-2 border-white/20 hidden md:block" alt="Uma Icon" />
+             <div>
+               <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-100 via-yellow-400 to-yellow-600 bg-clip-text text-transparent italic tracking-tighter">
+                 UMA MUSUME
+               </h1>
+               <p className="text-[10px] text-gray-500 font-display tracking-[0.3em] mt-1 leading-none uppercase">PRETTY DERBY - SUMMON GATE</p>
+             </div>
           </div>
         </div>
 
