@@ -87,7 +87,7 @@ export default function SecretDungeon() {
             { id: 'sudoku', name: 'SUDOKU', icon: '🔢', desc: 'Logic-based numbers', path: '/arcade/sudoku' },
             { id: 'snake', name: 'SNAKE', icon: '🐍', desc: 'Retro snake eater', path: '/arcade/snake' },
             { id: 'bubble', name: 'BUBBLE BLAST', icon: '🫧', desc: 'Pop the colorful bubbles', path: '/arcade/bubble' },
-            { id: 'match3', name: 'CANDY MATCH', icon: '🍬', desc: 'Sweet matching puzzle', path: '/arcade/match3', comingSoon: true },
+            { id: 'match3', name: 'CANDY MATCH', icon: '🍬', desc: 'Sweet matching puzzle', path: '/arcade/match3' },
             { id: 'shooter', name: 'SPACE SHOOTER', icon: '🚀', desc: 'Galactic combat', path: '/arcade/shooter', comingSoon: true },
           ].map((game) => (
             <button

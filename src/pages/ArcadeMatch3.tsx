@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Construction, Star } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { playButtonSound } from "@/lib/audio";
+import { CandyMatch } from "@/components/CandyMatch";
 import { SEO } from "@/components/SEO";
 
 export default function ArcadeMatch3() {
@@ -9,15 +10,16 @@ export default function ArcadeMatch3() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="w-full max-w-4xl mx-auto pb-12 h-[80vh] flex flex-col"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="w-full max-w-5xl mx-auto pb-12"
     >
       <SEO 
         title="Arcade: Candy Match | Secret Dungeon"
-        description="Coming Soon: Sweet match-3 puzzle adventure."
+        description="A sweet match-3 puzzle adventure in the Secret Dungeon's Arcade."
       />
 
+      {/* Navigation */}
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={() => { navigate("/secret-dungeon"); playButtonSound(); }}
@@ -25,31 +27,22 @@ export default function ArcadeMatch3() {
         >
           <ArrowLeft size={14} /> BACK TO DUNGEON
         </button>
+        
+        <div className="pixel-panel px-4 py-2 bg-pink-500/10 border-pink-500/50">
+          <span className="font-display text-[10px] text-pink-400 uppercase">Arcade Mode: Confection_Protocol</span>
+        </div>
       </div>
 
-      <div className="flex-grow pixel-panel bg-card/30 flex flex-col items-center justify-center gap-6 p-12 text-center border-dashed border-2 border-white/10">
-        <div className="grid grid-cols-2 gap-2">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-10 h-10 pixel-panel flex items-center justify-center bg-pink-500/20 text-pink-500 animate-pulse">
-              <Star size={20} fill="currentColor" fillOpacity={0.2} />
-            </div>
-          ))}
-        </div>
-        
-        <div>
-          <h2 className="font-display text-3xl text-pink-500 mb-2 uppercase">Candy Match</h2>
-          <p className="font-body text-xl text-muted-foreground uppercase tracking-widest">
-            Coming Soon — Sweetening...
-          </p>
-        </div>
+      {/* Game Content */}
+      <div className="pixel-panel p-2 md:p-8 bg-card/40 backdrop-blur-md shadow-2xl min-h-[600px] flex items-center justify-center overflow-hidden">
+        <CandyMatch />
+      </div>
 
-        <p className="font-body text-muted-foreground max-w-md mx-auto italic">
-          "The sugars are crystallizing. A match-3 adventure of epic proportions is being prepared."
+      {/* Footer Legend */}
+      <div className="mt-8 text-center px-4 max-w-2xl mx-auto">
+        <p className="font-body text-muted-foreground italic text-xs leading-relaxed opacity-60">
+          "The sugars align in patterns only the most focused minds can decode. Match the sweetness, prevent the crash, and unlock the next layer of the neural web."
         </p>
-
-        <div className="font-display text-[8px] text-pink-500/60 border border-pink-500/20 px-4 py-2 mt-4 animate-pulse uppercase">
-          Work in Progress: Refining Delicious Layouts...
-        </div>
       </div>
     </motion.div>
   );
