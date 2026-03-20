@@ -84,7 +84,7 @@ export default function SecretDungeon() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
           {[
             { id: 'tetris', name: 'TETRIS', icon: '🧱', desc: 'Classic block puzzle', path: '/arcade/tetris' },
-            { id: 'sudoku', name: 'SUDOKU', icon: '🔢', desc: 'Logic-based numbers', path: '/arcade/sudoku', comingSoon: true },
+            { id: 'sudoku', name: 'SUDOKU', icon: '🔢', desc: 'Logic-based numbers', path: '/arcade/sudoku' },
             { id: 'snake', name: 'SNAKE', icon: '🐍', desc: 'Retro snake eater', path: '/arcade/snake', comingSoon: true },
             { id: 'bubble', name: 'BUBBLE BLAST', icon: '🫧', desc: 'Pop the colorful bubbles', path: '/arcade/bubble', comingSoon: true },
             { id: 'match3', name: 'CANDY MATCH', icon: '🍬', desc: 'Sweet matching puzzle', path: '/arcade/match3', comingSoon: true },

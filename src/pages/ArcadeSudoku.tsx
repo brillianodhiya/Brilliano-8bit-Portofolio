@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Construction } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { playButtonSound } from "@/lib/audio";
+import { Sudoku } from "@/components/Sudoku";
 import { SEO } from "@/components/SEO";
 
 export default function ArcadeSudoku() {
@@ -9,15 +10,16 @@ export default function ArcadeSudoku() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-4xl mx-auto pb-12 h-[80vh] flex flex-col"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="w-full max-w-4xl mx-auto pb-12"
     >
       <SEO 
         title="Arcade: Sudoku | Secret Dungeon"
-        description="Coming Soon: Logic-based number placement puzzle."
+        description="Solve the ancient number puzzles in the Logic Chamber."
       />
 
+      {/* Navigation */}
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={() => { navigate("/secret-dungeon"); playButtonSound(); }}
@@ -25,27 +27,22 @@ export default function ArcadeSudoku() {
         >
           <ArrowLeft size={14} /> BACK TO DUNGEON
         </button>
+        
+        <div className="pixel-panel px-4 py-2 bg-accent/10 border-accent/50">
+          <span className="font-display text-[10px] text-accent">ARCADE MODE: SUDOKU</span>
+        </div>
       </div>
 
-      <div className="flex-grow pixel-panel bg-card/30 flex flex-col items-center justify-center gap-6 p-12 text-center border-dashed border-2 border-white/10">
-        <div className="w-20 h-20 pixel-panel flex items-center justify-center bg-accent/20 text-accent animate-bounce">
-          <Construction size={40} />
-        </div>
-        
-        <div>
-          <h2 className="font-display text-3xl text-accent mb-2">SUDOKU</h2>
-          <p className="font-body text-xl text-muted-foreground uppercase tracking-widest">
-            Coming Soon — Under Construction
-          </p>
-        </div>
+      {/* Game Content */}
+      <div className="pixel-panel p-6 bg-card/50 backdrop-blur-sm shadow-2xl min-h-[600px] flex items-center justify-center">
+        <Sudoku />
+      </div>
 
-        <p className="font-body text-muted-foreground max-w-md mx-auto italic">
-          "The numbers are still being calculated. Check back after the next dungeon excavation."
+      {/* Footer Instructions */}
+      <div className="mt-8 text-center">
+        <p className="font-body text-muted-foreground italic text-sm">
+          "The logic of the ancients remains unbroken. Can you restore the sequence?"
         </p>
-
-        <div className="font-display text-[8px] text-accent/60 border border-accent/20 px-4 py-2 mt-4 animate-pulse">
-          WORK IN PROGRESS: EXCAVATING LOGIC CHAMBERS...
-        </div>
       </div>
     </motion.div>
   );
