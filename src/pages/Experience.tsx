@@ -14,6 +14,8 @@ interface Experience {
   description: string[];
   tech: string[];
   display_order: number;
+  rank?: string;
+  rank_boss?: string;
 }
 
 export default function Experience() {
@@ -65,7 +67,9 @@ export default function Experience() {
             <div className="bg-muted/30 border-b-4 border-white p-4 flex justify-between items-center gap-4">
               <div className="flex items-center gap-2 text-accent">
                 <Briefcase size={14} className="flex-shrink-0" />
-                <span className="font-display text-[8px] uppercase tracking-wider whitespace-nowrap">RANK: {isKanrishaurus ? "OVERLORD" : "SENIOR"}</span>
+                <span className="font-display text-[8px] uppercase tracking-wider whitespace-nowrap">
+                  RANK: {isKanrishaurus ? (quest.rank_boss || "MINION") : (quest.rank || "MEMBER")}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
                 <Calendar size={12} className="flex-shrink-0" />
