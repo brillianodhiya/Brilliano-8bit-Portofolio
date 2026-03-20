@@ -46,8 +46,9 @@ import { useLocation } from "wouter";
 import { closeNesController, getNesControllerOpen, subscribeNesController, subscribeArcadeMode, getArcadeMode } from "@/lib/nes-controller-state";
 
 function KonamiCodeListener() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [isNesOpen, setIsNesOpen] = useState(false);
+  const isArcadePage = location.startsWith("/arcade/");
 
   useEffect(() => {
     const unsub = subscribeNesController(() => setIsNesOpen(getNesControllerOpen()));
@@ -67,7 +68,9 @@ function KonamiCodeListener() {
     secretAudio.play().catch(() => {});
     closeNesController();
     setTimeout(() => navigate("/secret-dungeon"), 600);
-  }, { disabled: isArcadeMode });
+  }, { disabled: isArcadeMode || isArcadePage });
+
+  if (isArcadePage) return null;
 
   return (
     <>
