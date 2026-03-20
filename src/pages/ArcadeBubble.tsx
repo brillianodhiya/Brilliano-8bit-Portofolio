@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Construction, Circle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { playButtonSound } from "@/lib/audio";
+import { BubbleBlast } from "@/components/BubbleBlast";
 import { SEO } from "@/components/SEO";
 
 export default function ArcadeBubble() {
@@ -9,15 +10,16 @@ export default function ArcadeBubble() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-full max-w-4xl mx-auto pb-12 h-[80vh] flex flex-col"
+      className="w-full max-w-5xl mx-auto pb-12"
     >
       <SEO 
         title="Arcade: Bubble Blast | Secret Dungeon"
-        description="Coming Soon: Pop the colorful bubbles in this addictive arcade game."
+        description="Pop the colorful bubbles in this addictive high-speed arcade game."
       />
 
+      {/* Navigation */}
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={() => { navigate("/secret-dungeon"); playButtonSound(); }}
@@ -25,31 +27,22 @@ export default function ArcadeBubble() {
         >
           <ArrowLeft size={14} /> BACK TO DUNGEON
         </button>
+        
+        <div className="pixel-panel px-4 py-2 bg-blue-500/10 border-blue-500/50">
+          <span className="font-display text-[10px] text-blue-400 uppercase">Arcade Mode: Bubble_Protocol</span>
+        </div>
       </div>
 
-      <div className="flex-grow pixel-panel bg-card/30 flex flex-col items-center justify-center gap-6 p-12 text-center border-dashed border-2 border-white/10">
-        <div className="flex gap-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="w-12 h-12 pixel-panel flex items-center justify-center bg-blue-400/20 text-blue-400 animate-bounce" style={{ animationDelay: `${i * 0.2}s` }}>
-              <Circle size={24} fill="currentColor" fillOpacity={0.2} />
-            </div>
-          ))}
-        </div>
-        
-        <div>
-          <h2 className="font-display text-3xl text-blue-400 mb-2 uppercase">Bubble Blast</h2>
-          <p className="font-body text-xl text-muted-foreground uppercase tracking-widest">
-            Coming Soon — Filling with Air...
-          </p>
-        </div>
+      {/* Game Content */}
+      <div className="pixel-panel p-2 md:p-8 bg-card/40 backdrop-blur-md shadow-2xl min-h-[600px] flex items-center justify-center overflow-hidden">
+        <BubbleBlast />
+      </div>
 
-        <p className="font-body text-muted-foreground max-w-md mx-auto italic">
-          "The bubbles are being pressurized for maximum popping satisfaction. Stay tuned."
+      {/* Footer Legend */}
+      <div className="mt-8 text-center px-4 max-w-2xl mx-auto">
+        <p className="font-body text-muted-foreground italic text-xs leading-relaxed opacity-60">
+          "The beauty of the bubble lies in its impermanence. A single link can shatter the most complex patterns. Aim true, and clear the neural congestion."
         </p>
-
-        <div className="font-display text-[8px] text-blue-400/60 border border-blue-400/20 px-4 py-2 mt-4 animate-pulse uppercase">
-          Work in Progress: Generating Spherical Logic...
-        </div>
       </div>
     </motion.div>
   );
