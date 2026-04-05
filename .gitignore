@@ -51,3 +51,16 @@ Thumbs.db
 
 .bun.lock
 package-lock.json
+
+# File
+CVDetail.md
+DATA_GUIDE.md
+db_info.txt
+DEPLOYMENT.md
+LOCAL_SETUP.md
+migration_update.sql
+MONITORING.md
+PROJECT_STRUCTURE.md
+SUPABASE_SETUP.md
+sync_output.txt
+schema.sql

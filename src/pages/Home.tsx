@@ -32,6 +32,19 @@ export default function Home() {
   useEffect(() => {
     // Just to ensure achievements listener is primed
     unlockAchievement("explorer");
+    
+    // Increment visitor count in Supabase
+    const incrementVisitor = async () => {
+      try {
+        const { supabase } = await import("@/lib/supabaseClient");
+        if (supabase) {
+          await supabase.rpc('increment_visitor_count', { page_identifier: 'home' });
+        }
+      } catch (err) {
+        console.error("Failed to increment visitor count:", err);
+      }
+    };
+    incrementVisitor();
   }, []);
 
   const handleDownload = () => {
