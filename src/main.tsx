@@ -5,7 +5,6 @@ import App from "./App";
 import "./index.css";
 
 // Initialize Grafana Faro for Real User Monitoring (RUM)
-// If you are trying Grafana Cloud, you can get these values from the "Frontend Observability" section.
 const faroUrl = import.meta.env.VITE_GRAFANA_FARO_URL;
 
 if (faroUrl) {
