@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Download, Terminal, Gamepad2, Code2, Cpu, Loader2, Github, Linkedin } from "lucide-react";
 import { CommitGraph } from "@/components/CommitGraph";
 import { useAchievements } from "@/hooks/use-achievements";
@@ -29,21 +29,22 @@ export default function Home() {
   const DIALOGUE_GLITCH = "⚠️ ERROR: Critical failure in escaping. Re-summoning heroes... Destiny is unavoidable.";
   const { displayedText, isComplete } = useTypingEffect(dialogueGlitched ? DIALOGUE_GLITCH : DIALOGUE_BASE, 30);
 
-  const hasIncremented = useRef(false);
-
   useEffect(() => {
     // Just to ensure achievements listener is primed
     unlockAchievement("explorer");
     
-    // Increment visitor count in Supabase (only once per session/mount)
+    // Increment visitor count in Supabase (only once per browser session)
     const incrementVisitor = async () => {
-      if (hasIncremented.current) return;
-      hasIncremented.current = true;
+      const alreadyIncremented = sessionStorage.getItem('portfolio_visited');
+      if (alreadyIncremented) return;
       
       try {
         const { supabase } = await import("@/lib/supabaseClient");
         if (supabase) {
-          await supabase.rpc('increment_visitor_count', { page_identifier: 'home' });
+          const { error } = await supabase.rpc('increment_visitor_count', { page_identifier: 'home' });
+          if (!error) {
+            sessionStorage.setItem('portfolio_visited', 'true');
+          }
         }
       } catch (err) {
         console.error("Failed to increment visitor count:", err);
