@@ -181,6 +181,13 @@
     image-rendering: pixelated;
     image-rendering: crisp-edges;
   }
+
+  /* Finer pixel filter for larger images (profile photo) */
+  .pixel-icon-fine {
+    filter: url(#pixelate-fine);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
 }
 
 @keyframes flicker {

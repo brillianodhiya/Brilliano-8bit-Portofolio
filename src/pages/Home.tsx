@@ -117,21 +117,23 @@ export default function Home() {
               }}
               className="w-32 h-32 md:w-48 md:h-48 border-4 border-white relative bg-muted animate-float cursor-pointer group hover:border-primary transition-colors overflow-hidden"
             >
-              <AnimatePresence mode="wait">
-                <motion.img 
-                  key={isKanrishaurus ? 'alt' : 'normal'}
-                  initial={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
-                  animate={{ filter: 'brightness(1) grayscale(0)', opacity: 1 }}
-                  exit={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
-                  src={isKanrishaurus 
-                    ? `${import.meta.env.BASE_URL}me-alternate2.png`
-                    : (profile?.avatar_url 
-                      ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${import.meta.env.BASE_URL}${profile.avatar_url}`) 
-                      : `${import.meta.env.BASE_URL}images/pixel-avatar.png`)} 
-                  alt={isKanrishaurus ? "Kanrishaurus" : (profile?.name || 'Brilliano')} 
-                  className="w-full h-full object-cover rendering-pixelated"
-                />
-              </AnimatePresence>
+              <div className="w-full h-full pixel-icon-fine">
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={isKanrishaurus ? 'alt' : 'normal'}
+                    initial={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
+                    animate={{ filter: 'brightness(1) grayscale(0)', opacity: 1 }}
+                    exit={{ filter: 'brightness(2) grayscale(1)', opacity: 0 }}
+                    src={isKanrishaurus 
+                      ? `${import.meta.env.BASE_URL}me-alternate.webp`
+                      : (profile?.avatar_url 
+                        ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${import.meta.env.BASE_URL}${profile.avatar_url}`) 
+                        : `${import.meta.env.BASE_URL}images/pixel-avatar.png`)} 
+                    alt={isKanrishaurus ? "Kanrishaurus" : (profile?.name || 'Brilliano')} 
+                    className="w-full h-full object-cover"
+                  />
+                </AnimatePresence>
+              </div>
               <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground border-2 border-white px-2 py-1 font-display text-[10px] z-10">
