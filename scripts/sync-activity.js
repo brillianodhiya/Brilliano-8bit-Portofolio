@@ -5,6 +5,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import WebSocket from 'ws';
 
+// Polyfill WebSocket globally for Node.js environments (like GitHub Actions on older Node versions)
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = WebSocket;
+}
+
 // Load .env manually if not already present in process.env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, '../.env');
