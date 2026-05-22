@@ -11,12 +11,16 @@ import { SEO } from "@/components/SEO";
 
 import { useTheme } from "@/context/ThemeContext";
 import { toggleNesController } from "@/lib/nes-controller-state";
+import { useLocation } from "wouter";
+
 
 export default function Home() {
   const { unlockAchievement } = useAchievements();
   const { isKanrishaurus, toggleKanrishaurus } = useTheme();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = usePortfolioData('attributes');
+  const [, navigate] = useLocation();
+
   
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
@@ -334,8 +338,13 @@ export default function Home() {
         {/* Git Stats Panel */}
         <div className="pixel-panel p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-display text-sm md:text-base text-primary text-shadow-pixel">
-              ACTIVITY LOG
+            <h3 
+              onClick={() => { playButtonSound(); navigate("/activity"); }}
+              className="font-display text-sm md:text-base text-primary text-shadow-pixel cursor-pointer hover:text-accent transition-colors flex items-center gap-1.5 group/title"
+              title="View full screen Activity Log"
+            >
+              <span>ACTIVITY LOG</span>
+              <span className="text-[10px] opacity-60 group-hover/title:opacity-100 transition-opacity">🔍</span>
             </h3>
             <span className="font-body text-xl text-muted-foreground">Contributions</span>
           </div>

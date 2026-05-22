@@ -36,6 +36,8 @@ const SummonGirls = lazy(() => import("@/pages/SummonGirls"));
 const SummonBoys = lazy(() => import("@/pages/SummonBoys"));
 const GachaCollection = lazy(() => import("@/pages/GachaCollection"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const ActivityLog = lazy(() => import("@/pages/ActivityLog"));
+
 
 // Global Konami Code listener component
 import { useKonamiCode } from "@/hooks/use-konami-code";
@@ -129,6 +131,7 @@ function Router() {
           <Route path="/certifications" component={Certifications} />
           <Route path="/gallery" component={Gallery} />
           <Route path="/skills" component={Skills} />
+          <Route path="/activity" component={ActivityLog} />
           <Route path="/secret-dungeon" component={SecretDungeon} />
           <Route path="/arcade/tetris" component={ArcadeTetris} />
           <Route path="/arcade/sudoku" component={ArcadeSudoku} />
