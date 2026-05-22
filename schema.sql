@@ -51,9 +51,11 @@ create table public.portfolio_projects (
   title text not null,
   type text, -- "Web App", "Quest", etc.
   description text,
-  image text,
+  images text[],
   tech text[],
-  link text,
+  company text,
+  demo_url text,
+  github_url text,
   status text, -- "COMPLETED", "IN_PROGRESS"
   color text, -- "border-primary", "border-secondary"
   display_order integer default 0
@@ -68,16 +70,23 @@ create table public.portfolio_awards (
   icon text, -- lucide icon name or emoji
   rarity text, -- "LEGENDARY", "RARE"
   color text, -- text-yellow-400
+  certificate_url text,
   display_order integer default 0
 );
 
 -- TABEL: Education
-create table public.portfolio_education (
-  id uuid default gen_random_uuid() primary key,
-  year text not null,
-  title text not null,
-  location text,
   description text,
+  display_order integer default 0
+);
+
+-- TABEL: Experience (QUEST LOG)
+create table public.portfolio_experience (
+  id uuid default gen_random_uuid() primary key,
+  company text not null,
+  position text not null,
+  period text not null,
+  description text[] default '{}',
+  tech text[] default '{}',
   display_order integer default 0
 );
 
@@ -97,6 +106,7 @@ alter table public.portfolio_skills enable row level security;
 alter table public.portfolio_projects enable row level security;
 alter table public.portfolio_awards enable row level security;
 alter table public.portfolio_education enable row level security;
+alter table public.portfolio_experience enable row level security;
 alter table public.portfolio_gallery enable row level security;
 
 -- Setup public read access policies
@@ -107,6 +117,7 @@ create policy "Public Read" on public.portfolio_skills for select using (true);
 create policy "Public Read" on public.portfolio_projects for select using (true);
 create policy "Public Read" on public.portfolio_awards for select using (true);
 create policy "Public Read" on public.portfolio_education for select using (true);
+create policy "Public Read" on public.portfolio_experience for select using (true);
 create policy "Public Read" on public.portfolio_gallery for select using (true);
 
 -- TABEL: Page Visits (Tracking)
@@ -205,21 +216,59 @@ insert into public.portfolio_skills (id, name, level, category_id, description, 
 ('laravel', 'Laravel', 3, 'backend', 'Enterprise backend systems.', 'https://skillicons.dev/icons?i=laravel', 5);
 
 -- Projects
-insert into public.portfolio_projects (title, description, image, tech, status, type, color, display_order) values
-('AI SNS Platform', 'AI-powered social networking platform with Supabase RLS.', 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80', '{Next.js,Supabase,AI}', 'COMPLETED', 'Web App', 'border-primary', 1),
-('IoT Monitoring', 'Real-time dashboard managing 10,000+ connected devices.', 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80', '{Next.js,IoT,Realtime}', 'COMPLETED', 'System', 'border-secondary', 2),
-('Crypto Job Search', 'Blockchain-based recruitment platform with wallet integration.', 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80', '{Next.js,Web3,Tailwind}', 'COMPLETED', 'Web3', 'border-accent', 3);
+insert into public.portfolio_projects (title, description, images, tech, company, status, type, color, demo_url, github_url, display_order) values
+('AI SNS Platform', 'AI-powered social networking platform with Supabase RLS.', '{"https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80", "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"}', '{Next.js,Supabase,AI}', 'Personal Project', 'COMPLETED', 'Web App', 'border-primary', 'https://example.com', 'https://github.com', 1),
+('IoT Monitoring', 'Real-time dashboard managing 10,000+ connected devices.', '{"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80"}', '{Next.js,IoT,Realtime}', 'PT IoT Kreasi Indonesia', 'COMPLETED', 'System', 'border-secondary', 'https://example.com', 'https://github.com', 2),
+('Crypto Job Search', 'Blockchain-based recruitment platform with wallet integration.', '{"https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80"}', '{Next.js,Web3,Tailwind}', 'Freelance', 'COMPLETED', 'Web3', 'border-accent', 'https://example.com', 'https://github.com', 3);
 
 -- Awards
-insert into public.portfolio_awards (title, issuer, date, rarity, color, icon) values
-('Performance Optimization Specialist', 'Technical Achievement', '2025', 'LEGENDARY', 'text-yellow-400', 'Zap'),
-('Senior Frontend Maven', 'Meta / Coursera', '2023', 'EPIC', 'text-orange-400', 'Star'),
-('Clean Code Guardian', 'Security Standard', 'Always', 'RARE', 'text-blue-400', 'Shield');
+insert into public.portfolio_awards (title, issuer, date, rarity, color, icon, certificate_url) values
+('Performance Optimization Specialist', 'Technical Achievement', '2025', 'LEGENDARY', 'text-yellow-400', 'Zap', 'https://example.com/cert1'),
+('Senior Frontend Maven', 'Meta / Coursera', '2023', 'EPIC', 'text-orange-400', 'Star', 'https://example.com/cert2'),
+('Clean Code Guardian', 'Security Standard', 'Always', 'RARE', 'text-blue-400', 'Shield', 'https://example.com/cert3');
 
 -- Education
 insert into public.portfolio_education (year, title, location, description) values
 ('2020 - 2024', 'B.S. in Computer Science', 'Tech University Academy', 'Mastered the arcane arts of algorithms and software engineering with high INT stats.'),
 ('2018 - 2020', 'Vocational High School', 'Code Crafters High', 'First contact with the web canvas and basic text editors.');
 
+-- Experience (QUEST LOG)
+insert into public.portfolio_experience (company, position, period, description, tech, display_order) values
+('80&Company | Kyoto, Japan (Remote)', 'IT Project Manager (Freelance Technical Lead)', 'Nov 2025 – Feb 2026', 
+ '{"Lead full-stack development of AI-powered SNS platform, architecting backend infrastructure using Supabase with RLS", "Design and implement secure authentication system supporting OAuth 2.0 (Google, Facebook)", "Translate CEO vision into technical roadmaps, delivering 3 major feature releases", "Engineer and test AI bot personas using prompt engineering"}', 
+ '{Next.js,Supabase,AI,Prompt Engineering}', 1),
+
+('PT. IoT Kreasi Indonesia', 'Senior Frontend Developer', 'Jan 2021 – Present', 
+ '{"Standardize frontend development stack using React and Next.js best practices", "Develop flagship IoT monitoring platform managing 10,000+ connected devices", "Build enterprise ticketing and automated billing modules", "Increase organic traffic by 45% through dynamic SEO infrastructure", "Reduce page load time from 4.2s to 1.1s via ISR and optimization"}', 
+ '{Next.js,React,TypeScript,IoT,Keycloak,SEO}', 2),
+
+('80&Company | Kyoto, Japan (Remote)', 'Frontend Developer (Freelance)', 'July 2024 – July 2025', 
+ '{"Develop crypto-based job search platform with wallet authentication", "Optimize high-traffic Shopify e-commerce templates for KOSE MUWMAZE", "Improve mobile Core Web Vitals scores by 35%"}', 
+ '{Next.js,TypeScript,Web3,Shopify,Performance}', 3),
+
+('Kisah Kreatif | Jakarta, Indonesia (Remote)', 'Technical Lead & Frontend Developer (Freelance)', 'Feb 2023 – March 2024', 
+ '{"Deliver Pilog logistics website for PT. Pupuk Indonesia Logistik", "Architect secure LMS with forced fullscreen anti-cheating mechanisms", "Lead 3-person development team through full project lifecycle"}', 
+ '{Next.js,React,LMS,Technical Lead}', 4),
+
+('PT. Trimagnus Prima Dharma', 'Fullstack Developer', 'Jan 2020 – Jan 2021', 
+ '{"Transform IoT prototype into market-ready product for 50+ enterprise clients", "Develop e-commerce platform for Hoops Indonesia", "Harden authentication and payment workflows (zero security incidents)"}', 
+ '{Laravel,MySQL,IoT,E-commerce,Security}', 5);
+
 -- Visitors Initial
 insert into public.portfolio_page_visits (id, count) values ('total_visitors', 1337);
+insert into public.portfolio_page_visits (id, count) values ('achievement_players', 0);
+
+-- TABEL: Avatars (Global World)
+create table public.portfolio_avatars (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  skin text default 'rex',
+  x_pos integer default 0,
+  is_online boolean default true,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.portfolio_avatars enable row level security;
+create policy "Public Read" on public.portfolio_avatars for select using (true);
+create policy "Public Insert" on public.portfolio_avatars for insert with check (true);
+create policy "Public Update" on public.portfolio_avatars for update using (true);

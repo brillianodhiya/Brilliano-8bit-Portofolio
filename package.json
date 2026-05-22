@@ -21,7 +21,8 @@
     "pdf-lib": "^1.17.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "wouter": "^3.3.5"
+    "wouter": "^3.3.5",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

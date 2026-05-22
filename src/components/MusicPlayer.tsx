@@ -1,10 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Shuffle, Repeat, Repeat1 } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Shuffle, Repeat, Repeat1, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { usePortfolioData } from '@/hooks/use-portfolio-data';
 import { useAchievements } from '@/hooks/use-achievements';
+
+const getMusicOriginalUrl = (title: string) => {
+  const t = title.toLowerCase();
+  if (t.includes('3008')) return 'https://www.youtube.com/watch?v=r7vxapkY2yg';
+  if (t.includes('65535')) return 'https://www.youtube.com/watch?v=6xXu0cneaSY';
+  if (t.includes('otonoke')) return 'https://www.youtube.com/watch?v=CEc84WF0MDU';
+  if (t.includes('fantastic')) return 'https://www.youtube.com/watch?v=TFpGRnfc4AM';
+  if (t.includes('growing')) return 'https://www.youtube.com/watch?v=spxuYTGnn4U';
+  if (t.includes('newsong')) return 'https://www.youtube.com/watch?v=v-IajUGR2OU';
+  if (t.includes('hollow')) return 'https://www.youtube.com/watch?v=AL4s7Y0jBaA';
+  if (t.includes('peace')) return 'https://www.youtube.com/watch?v=te5cf77GvNQ';
+  if (t.includes('tomorrow')) return 'https://www.youtube.com/watch?v=Gz3IigSi0a4';
+  if (t.includes('weight')) return 'https://www.youtube.com/watch?v=mYxn_5kJANA';
+  if (t.includes('yusha')) return 'https://www.youtube.com/watch?v=vtUAsicQ1mY';
+  if (t.includes('file city')) return 'https://www.youtube.com/watch?v=A4VMnx5aAjY';
+  return 'https://www.youtube.com';
+};
 
 export function MusicPlayer() {
   const { data: playlist } = usePortfolioData('playlist');
@@ -16,6 +33,7 @@ export function MusicPlayer() {
   const [volume, setVolume] = useState(0.5);
   const [repeatMode, setRepeatMode] = useState<'none' | 'all' | 'one'>('all');
   const [isShuffle, setIsShuffle] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [vData, setVData] = useState<number[]>(new Array(12).fill(2));
   const analyzerRef = useRef<AnalyserNode | null>(null);
@@ -228,7 +246,50 @@ export function MusicPlayer() {
       />
       
       {location !== '/' && (
-        <div className="fixed bottom-4 left-4 right-4 sm:right-auto z-50">
+        <div className="fixed bottom-4 left-4 right-4 sm:right-auto z-50 flex flex-col items-stretch">
+          {/* Credits Panel Overlay */}
+          <AnimatePresence>
+            {showCredits && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="pixel-panel p-3 mb-2 bg-black/95 text-white font-mono min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px] max-h-[220px] overflow-y-auto z-10 border-2 border-white"
+              >
+                <div className="flex items-center justify-between border-b border-white/20 pb-1 mb-2">
+                  <span className="text-primary font-display text-[9px] uppercase tracking-wider">🎵 MUSIC CREDITS</span>
+                  <button 
+                    onClick={() => setShowCredits(false)}
+                    className="hover:text-primary transition-colors text-[8px] font-bold"
+                  >
+                    [X]
+                  </button>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {playlist.map((track: any) => (
+                    <div key={track.id} className="flex gap-2 items-center border-b border-white/5 pb-1.5 last:border-0 last:pb-0">
+                      <img 
+                        src={`${import.meta.env.BASE_URL}${track.cover_url?.replace(/^\//, '')}`} 
+                        className="w-6 h-6 object-cover border border-white/20 rendering-pixelated shrink-0" 
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold truncate text-[8px] uppercase tracking-tight text-white/95">{track.title}</div>
+                        <a 
+                          href={getMusicOriginalUrl(track.title)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-primary hover:underline text-[7px] block mt-0.5"
+                        >
+                          Watch Original on YouTube
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -340,9 +401,16 @@ export function MusicPlayer() {
               </div>
             </div>
 
-            {/* Retro Details */}
-            <div className="absolute top-1 right-1 flex gap-1">
-              <div className={cn("w-1 h-1 rounded-full", isPlaying ? "bg-green-500 animate-pulse outline outline-1 outline-green-500/50" : "bg-red-500 opacity-50")} />
+            {/* Retro Details & Credits Trigger */}
+            <div className="absolute top-1 right-1 flex items-center gap-1 px-0.5 py-0.5">
+              <button 
+                onClick={() => setShowCredits(!showCredits)}
+                className={cn("p-0.5 text-muted-foreground transition-colors hover:text-primary outline-none", showCredits && "text-primary")}
+                title="Music Credits"
+              >
+                <Info size={8} />
+              </button>
+              <div className={cn("w-1 h-1 rounded-full shrink-0", isPlaying ? "bg-green-500 animate-pulse outline outline-1 outline-green-500/50" : "bg-red-500 opacity-50")} />
             </div>
           </motion.div>
         </div>

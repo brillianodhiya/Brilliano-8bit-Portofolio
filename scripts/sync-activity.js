@@ -3,6 +3,7 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import WebSocket from 'ws';
 
 // Load .env manually if not already present in process.env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -32,7 +33,14 @@ const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'Kanrishaurus';
 const GITLAB_TOKEN = process.env.GITLAB_TOKEN;
 const GITLAB_USER_ID = process.env.GITLAB_USER_ID; 
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: {
+    persistSession: false
+  },
+  realtime: {
+    transport: WebSocket
+  }
+});
 
 async function fetchGitHubActivity() {
   if (!GITHUB_TOKEN || !GITHUB_USERNAME) {
