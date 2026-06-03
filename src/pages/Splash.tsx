@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
 import { SEO } from "@/components/SEO";
+import { playButtonSound } from "@/lib/audio";
 
 export default function Splash() {
   const [, setLocation] = useLocation();
@@ -10,11 +12,20 @@ export default function Splash() {
   
   const { displayedText } = useTypingEffect("BRILLIANO DHIYA ULHAQ", 100);
 
+  const [playMusic, setPlayMusic] = useState(() => {
+    return localStorage.getItem("portfolio-music-enabled") !== "false";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("portfolio-music-enabled", String(playMusic));
+  }, [playMusic]);
+
   const handleStart = () => {
     unlockAchievement("first_blood");
-    window.dispatchEvent(new CustomEvent('portfolio-start'));
+    window.dispatchEvent(new CustomEvent('portfolio-start', { detail: { playMusic } }));
     setLocation("/hub");
   };
+
 
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center relative z-10 bg-background/80 backdrop-blur-sm">
@@ -52,6 +63,18 @@ export default function Splash() {
         className="font-display text-xl text-white animate-pulse"
       >
         - PRESS START -
+      </motion.button>
+
+      <motion.button
+        onClick={() => {
+          playButtonSound();
+          setPlayMusic(!playMusic);
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="mt-8 font-display text-[10px] tracking-wider text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 border-2 border-white/20 hover:border-primary/50 px-3 py-1.5 bg-black/40 hover:bg-black/60 pixel-corners"
+      >
+        <span>{playMusic ? "🔊 MUSIC: ON" : "🔇 MUSIC: OFF"}</span>
       </motion.button>
       
       <div className="absolute bottom-8 left-0 right-0 text-center font-body text-muted-foreground text-sm">

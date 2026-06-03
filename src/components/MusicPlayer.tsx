@@ -224,11 +224,19 @@ export function MusicPlayer() {
 
   // Listen for global start event (from Splash screen)
   useEffect(() => {
-    const handleStartEvent = async () => {
+    const handleStartEvent = async (e: Event) => {
+      const customEvent = e as CustomEvent<{ playMusic: boolean }>;
+      const playMusic = customEvent.detail?.playMusic ?? true;
+
       if (audioCtxRef.current?.state === 'suspended') {
         await audioCtxRef.current.resume();
       }
-      setIsPlaying(true);
+      
+      if (playMusic) {
+        setIsPlaying(true);
+      } else {
+        setIsPlaying(false);
+      }
     };
 
     window.addEventListener('portfolio-start', handleStartEvent);
