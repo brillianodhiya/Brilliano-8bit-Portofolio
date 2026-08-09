@@ -48,7 +48,7 @@ export default function Gallery() {
               <div className="border-4 border-muted overflow-hidden relative aspect-video bg-black">
                 {isVideo ? (
                   <iframe
-                    className="w-full h-full relative z-30"
+                    className="w-full h-full"
                     src={`https://www.youtube.com/embed/${img.youtube_id}`}
                     title={img.title}
                     frameBorder="0"
