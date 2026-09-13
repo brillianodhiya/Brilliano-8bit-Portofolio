@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playButtonSound } from "@/lib/audio";
+import { saveArcadeScore } from "@/lib/leaderboard";
 import { 
   Trophy, 
   RotateCcw, 
@@ -77,6 +78,12 @@ export function CandyMatch() {
     setStatus('PLAYING');
     playButtonSound();
   };
+
+  useEffect(() => {
+    if (status === 'GAMEOVER' && score > 0) {
+      saveArcadeScore('match3', score);
+    }
+  }, [status, score]);
 
   // --- Match Logic ---
   const checkMatches = useCallback((currentBoard: (Candy | null)[][]) => {

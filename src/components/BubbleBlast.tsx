@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playButtonSound } from "@/lib/audio";
+import { saveArcadeScore } from "@/lib/leaderboard";
 import { 
   RotateCcw, 
   Play, 
@@ -86,6 +87,12 @@ export function BubbleBlast() {
     setProjectile(null);
     playButtonSound();
   };
+
+  useEffect(() => {
+    if (status === 'GAMEOVER' && score > 0) {
+      saveArcadeScore('bubble', score);
+    }
+  }, [status, score]);
 
   // --- Logic: Clustering & Gravity ---
   const getNeighbors = (row: number, col: number) => {

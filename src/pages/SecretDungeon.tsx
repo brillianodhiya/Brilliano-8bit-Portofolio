@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Youtube, Wrench, Gamepad2, Dice6, Lock, ArrowLeft, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -7,14 +7,17 @@ import { playButtonSound } from "@/lib/audio";
 import { useAchievements } from "@/hooks/use-achievements";
 import { SEO } from "@/components/SEO";
 import { useLocation } from "wouter";
+import { ArcadeCartridge3D } from "@/components/3d/ArcadeCartridge3D";
+import { RetroTv3D } from "@/components/3d/RetroTv3D";
+import { ArcadeLeaderboard } from "@/components/ArcadeLeaderboard";
 
 const YOUTUBE_CHANNELS = [
-  { name: "Pyroseus", url: "https://www.youtube.com/@pyroseus", desc: "Deep dives into fascinating topics", icon: "https://yt3.googleusercontent.com/s_Y67lCkWjNpAuvmb-sdDaSCEanEqRvlodmIjyXyIierG53sZlF3_6fMUnfGl__HvrWQ5-bykQ=s160-c-k-c0x00ffffff-no-rj" },
-  { name: "Windah Basudara", url: "https://www.youtube.com/@WindahBasudara", desc: "Gaming & entertainment legend", icon: "https://yt3.googleusercontent.com/ZM0JpQTkJn-wJ3OfOD_TLFPnI-uno1QrWz20JH_FBtWK1oUCq032OkHIHO4Rr27ul_czy8g6Xw=s160-c-k-c0x00ffffff-no-rj" },
-  { name: "Dunia Alam", url: "https://www.youtube.com/@Dunia_Alam", desc: "Exploring the wonders of nature", icon: "https://yt3.googleusercontent.com/zOWCoAVPooIkU1xaeq5kehrPB9nUDek61Qy-3gTBDoczliryW30UIBC0yG7mJ6Nj5JSjll6Mgg=s160-c-k-c0x00ffffff-no-rj" },
-  { name: "Belajar Dunia Purba", url: "https://www.youtube.com/@BelajarDuniaPurba", desc: "Journey into the prehistoric world", icon: "https://yt3.googleusercontent.com/ln6IaoBPZ5DLCMlrN3W-8aAZTNNfKcvx1M8auHw8eqoZFrNXdMhPe7wk2IZTmjs7tVq2q4SCl1o=s160-c-k-c0x00ffffff-no-rj" },
-  { name: "Dea Afrizal", url: "https://www.youtube.com/@deaafrizal", desc: "Tech reviews & digital lifestyle", icon: "https://yt3.googleusercontent.com/cKwv2BRMNSuGr6TUtEDqqdcY59bRfbrMHK86BAoadMD1R5LRzG4O-6A5MplEhyqAIxXdV9yh=s160-c-k-c0x00ffffff-no-rj" },
-  { name: "Fireship", url: "https://www.youtube.com/@Fireship", desc: "Fast-paced tech news & tutorials", icon: "https://yt3.googleusercontent.com/3fPNbkf_xPyCleq77ZhcxyeorY97NtMHVNUbaAON_RBDH9ydL4hJkjxC8x_4mpuopkB8oI7Ct6Y=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Pyroseus", url: "https://www.youtube.com/watch?v=5fcZ-4_msrA", desc: "Dinosaur Game", icon: "https://yt3.googleusercontent.com/s_Y67lCkWjNpAuvmb-sdDaSCEanEqRvlodmIjyXyIierG53sZlF3_6fMUnfGl__HvrWQ5-bykQ=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Windah Basudara", url: "https://www.youtube.com/watch?v=pSLuWDTsl5E", desc: "Gaming & entertainment legend", icon: "https://yt3.googleusercontent.com/ZM0JpQTkJn-wJ3OfOD_TLFPnI-uno1QrWz20JH_FBtWK1oUCq032OkHIHO4Rr27ul_czy8g6Xw=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Dunia Alam", url: "https://www.youtube.com/watch?v=nBclAbrzcYA", desc: "Exploring the wonders of nature", icon: "https://yt3.googleusercontent.com/zOWCoAVPooIkU1xaeq5kehrPB9nUDek61Qy-3gTBDoczliryW30UIBC0yG7mJ6Nj5JSjll6Mgg=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Belajar Dunia Purba", url: "https://www.youtube.com/watch?v=e1N24JjjX44", desc: "Journey into the prehistoric world", icon: "https://yt3.googleusercontent.com/ln6IaoBPZ5DLCMlrN3W-8aAZTNNfKcvx1M8auHw8eqoZFrNXdMhPe7wk2IZTmjs7tVq2q4SCl1o=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Dea Afrizal", url: "https://www.youtube.com/watch?v=q01Rzs47XUA", desc: "Tech reviews & digital lifestyle", icon: "https://yt3.googleusercontent.com/cKwv2BRMNSuGr6TUtEDqqdcY59bRfbrMHK86BAoadMD1R5LRzG4O-6A5MplEhyqAIxXdV9yh=s160-c-k-c0x00ffffff-no-rj" },
+  { name: "Fireship", url: "https://www.youtube.com/watch?v=2Xiljy4xzbc", desc: "Fast-paced tech news & tutorials", icon: "https://yt3.googleusercontent.com/3fPNbkf_xPyCleq77ZhcxyeorY97NtMHVNUbaAON_RBDH9ydL4hJkjxC8x_4mpuopkB8oI7Ct6Y=s160-c-k-c0x00ffffff-no-rj" },
 ];
 
 interface DungeonRoom {
@@ -32,11 +35,14 @@ export default function SecretDungeon() {
   const { isKanrishaurus } = useTheme();
   const { unlockAchievement } = useAchievements();
   const [, navigate] = useLocation();
+  const [selectedTvChannel, setSelectedTvChannel] = useState(0);
 
   useEffect(() => {
     // Automatically unlock the achievement when visiting the secret dungeon
     unlockAchievement("secret_dungeon");
   }, [unlockAchievement]);
+
+  const currentTvChannel = YOUTUBE_CHANNELS[selectedTvChannel] || YOUTUBE_CHANNELS[0];
 
   const rooms: DungeonRoom[] = [
     {
@@ -48,26 +54,48 @@ export default function SecretDungeon() {
       border: "border-red-500",
       locked: false,
       content: (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-          {YOUTUBE_CHANNELS.map((ch) => (
-            <a
-              key={ch.name}
-              href={ch.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={playButtonSound}
-              className="pixel-panel p-3 flex items-center gap-3 hover:border-red-400 transition-colors group bg-card/50"
-            >
-              <img src={ch.icon} alt={ch.name} className="w-10 h-10 flex-shrink-0 rounded-sm border-2 border-white/20 object-cover" />
-              <div className="flex-1 min-w-0">
-                <div className="font-display text-[9px] text-red-400 flex items-center gap-1 group-hover:text-red-300 transition-colors truncate">
-                  {ch.name}
-                  <ExternalLink size={9} className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="flex flex-col gap-4 mt-2">
+          {/* 3D Retro CRT TV Cabinet Webview Monitor */}
+          <RetroTv3D
+            channelName={currentTvChannel.name}
+            channelUrl={currentTvChannel.url}
+            channelDesc={currentTvChannel.desc}
+            channelNumber={selectedTvChannel + 1}
+          />
+
+          {/* Channel Selector Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+            {YOUTUBE_CHANNELS.map((ch, idx) => {
+              const isSelected = selectedTvChannel === idx;
+
+              return (
+                <div
+                  key={ch.name}
+                  onClick={() => {
+                    setSelectedTvChannel(idx);
+                    playButtonSound();
+                  }}
+                  className={cn(
+                    "pixel-panel p-3 flex items-center gap-3 transition-all cursor-pointer group",
+                    isSelected 
+                      ? "border-red-500 bg-red-500/15 shadow-[0_0_15px_rgba(255,0,0,0.3)] scale-[1.02]" 
+                      : "bg-card/50 hover:border-red-400 hover:bg-card/80"
+                  )}
+                >
+                  <img src={ch.icon} alt={ch.name} className="w-10 h-10 flex-shrink-0 rounded-sm border-2 border-white/20 object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display text-[9px] text-red-400 flex items-center justify-between">
+                      <span className="truncate">{ch.name}</span>
+                      <span className={cn("text-[7px] font-mono px-1 rounded border", isSelected ? "bg-red-500 text-white border-red-300" : "bg-black/40 text-muted-foreground border-white/10")}>
+                        {isSelected ? "LIVE ON TV" : `CH ${idx + 1}`}
+                      </span>
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground leading-tight mt-0.5 line-clamp-2">{ch.desc}</p>
+                  </div>
                 </div>
-                <p className="font-body text-sm text-muted-foreground leading-tight mt-0.5 line-clamp-2">{ch.desc}</p>
-              </div>
-            </a>
-          ))}
+              );
+            })}
+          </div>
         </div>
       ),
     },
@@ -81,36 +109,38 @@ export default function SecretDungeon() {
       border: "border-green-500",
       locked: false,
       content: (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-          {[
-            { id: 'tetris', name: 'TETRIS', icon: '🧱', desc: 'Classic block puzzle', path: '/arcade/tetris' },
-            { id: 'sudoku', name: 'SUDOKU', icon: '🔢', desc: 'Logic-based numbers', path: '/arcade/sudoku' },
-            { id: 'snake', name: 'SNAKE', icon: '🐍', desc: 'Retro snake eater', path: '/arcade/snake' },
-            { id: 'bubble', name: 'BUBBLE BLAST', icon: '🫧', desc: 'Pop the colorful bubbles', path: '/arcade/bubble' },
-            { id: 'match3', name: 'CANDY MATCH', icon: '🍬', desc: 'Sweet matching puzzle', path: '/arcade/match3' },
-            { id: 'shooter', name: 'SPACE SHOOTER', icon: '🚀', desc: 'Galactic combat', path: '/arcade/shooter', comingSoon: true },
-          ].map((game) => (
-            <button
-              key={game.id}
-              onClick={() => { if (!game.comingSoon) { navigate(game.path); playButtonSound(); } }}
-              className={cn(
-                "pixel-panel p-3 flex flex-col items-center text-center gap-2 transition-all group",
-                game.comingSoon ? "opacity-50 grayscale cursor-not-allowed" : "hover:border-green-400 hover:bg-green-400/5 cursor-pointer"
-              )}
-            >
-              <span className="text-3xl group-hover:scale-110 transition-transform">{game.icon}</span>
-              <div className="flex flex-col">
-                <span className="font-display text-[10px] text-green-400">{game.name}</span>
-                <span className="font-body text-[10px] text-muted-foreground leading-tight">{game.desc}</span>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+            {[
+              { id: 'tetris', name: 'TETRIS', icon: '🧱', color: '#00f0ff', desc: 'Classic block puzzle', path: '/arcade/tetris' },
+              { id: 'sudoku', name: 'SUDOKU', icon: '🔢', color: '#ffcc00', desc: 'Logic-based numbers', path: '/arcade/sudoku' },
+              { id: 'snake', name: 'SNAKE', icon: '🐍', color: '#00ff66', desc: 'Retro snake eater', path: '/arcade/snake' },
+              { id: 'bubble', name: 'BUBBLE BLAST', icon: '🫧', color: '#ff00aa', desc: 'Pop colorful bubbles', path: '/arcade/bubble' },
+              { id: 'match3', name: 'CANDY MATCH', icon: '🍬', color: '#aa00ff', desc: 'Sweet matching puzzle', path: '/arcade/match3' },
+              { id: 'shooter', name: 'SPACE SHOOTER', icon: '🚀', color: '#ff3300', desc: 'Galactic combat', path: '/arcade/shooter', comingSoon: true },
+            ].map((game) => (
+              <div key={game.id} className="relative group">
+                <ArcadeCartridge3D
+                  title={game.name}
+                  icon={game.icon}
+                  color={game.color}
+                  desc={game.desc}
+                  onClick={() => { if (!game.comingSoon) { navigate(game.path); playButtonSound(); } }}
+                  className="w-full h-48"
+                />
+                {game.comingSoon && (
+                  <div className="absolute top-2 right-2 font-display text-[8px] bg-red-500/80 text-white px-2 py-0.5 rounded border border-white/20 uppercase z-10 pointer-events-none">
+                    Coming Soon
+                  </div>
+                )}
               </div>
-              {game.comingSoon && (
-                <div className="font-display text-[6px] bg-muted/20 px-2 py-0.5 mt-1 border border-white/10 uppercase">
-                  Coming Soon
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <ArcadeLeaderboard />
+          </div>
+        </>
       ),
     },
     {
@@ -131,6 +161,7 @@ export default function SecretDungeon() {
             { id: 'bg', name: 'BG REMOVER', icon: '🖼️', desc: 'Remove image background', path: '/workshop/bg-remover' },
             { id: 'sprite', name: 'SPRITE CUTTER', icon: '✂️', desc: 'Sprite to GIF animator', path: '/workshop/sprite' },
             { id: 'pdf', name: 'PDF EDITOR', icon: '📄', desc: 'Edit and annotate PDFs', path: '/workshop/pdf' },
+            { id: 'voxel3d', name: '3D VOXEL STUDIO', icon: '🧊', desc: 'Create & export 3D models', path: '/workshop/voxel-3d' },
           ].map((tool) => (
             <button
               key={tool.id}

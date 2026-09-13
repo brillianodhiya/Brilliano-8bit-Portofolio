@@ -5,6 +5,7 @@ import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { usePortfolioData } from '@/hooks/use-portfolio-data';
 import { useAchievements } from '@/hooks/use-achievements';
+import { AudioVisualizer3D } from '@/components/3d/AudioVisualizer3D';
 
 const getMusicOriginalUrl = (title: string) => {
   const t = title.toLowerCase();
@@ -34,6 +35,7 @@ export function MusicPlayer() {
   const [repeatMode, setRepeatMode] = useState<'none' | 'all' | 'one'>('all');
   const [isShuffle, setIsShuffle] = useState(false);
   const [showCredits, setShowCredits] = useState(false);
+  const [showVisualizer3D, setShowVisualizer3D] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [vData, setVData] = useState<number[]>(new Array(12).fill(2));
   const analyzerRef = useRef<AnalyserNode | null>(null);
@@ -298,10 +300,24 @@ export function MusicPlayer() {
             )}
           </AnimatePresence>
 
+          {/* 3D Spectrum Visualizer Drawer */}
+          <AnimatePresence>
+            {showVisualizer3D && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                animate={{ opacity: 1, height: "auto", scale: 1 }}
+                exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                className="w-full max-w-full sm:max-w-[320px] mb-2 overflow-hidden z-20"
+              >
+                <AudioVisualizer3D isPlaying={isPlaying} audioData={vData} className="w-full h-24" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="pixel-panel p-1.5 sm:p-2 flex items-center gap-2 sm:gap-3 bg-card/90 backdrop-blur-sm min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px]"
+            className="pixel-panel p-1.5 sm:p-2 flex items-center gap-2 sm:gap-3 bg-card/95 backdrop-blur-md min-w-0 sm:min-w-[280px] max-w-full sm:max-w-[320px] relative shadow-2xl"
           >
             {/* Track Art / Icon */}
             <div className="relative w-10 h-10 border-2 border-white bg-black flex items-center justify-center overflow-hidden shrink-0">
@@ -320,15 +336,15 @@ export function MusicPlayer() {
             </div>
 
             {/* Info & Controls */}
-            <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+            <div className="flex-1 min-w-0 flex flex-col gap-0.5 pr-2">
               {/* Marquee Title */}
-              <div className="overflow-hidden whitespace-nowrap bg-black/60 border border-white/10 px-1 py-0.5 h-5 flex items-center">
+              <div className="overflow-hidden whitespace-nowrap bg-black/80 border border-white/20 px-2 py-0.5 h-5 flex items-center rounded-sm max-w-[170px] sm:max-w-[190px]">
                 <motion.div
-                  animate={{ x: [0, -400] }}
-                  transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
-                  className="font-display text-[8px] text-primary inline-block uppercase tracking-tighter"
+                  animate={{ x: [0, -300] }}
+                  transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
+                  className="font-display text-[8px] text-cyan-300 inline-block uppercase tracking-tight"
                 >
-                  NOW PLAYING: {currentTrack?.title} • {currentTrack?.title} • {currentTrack?.title} • 
+                  NOW PLAYING: {currentTrack?.title} • {currentTrack?.title} • 
                 </motion.div>
               </div>
 
@@ -409,16 +425,28 @@ export function MusicPlayer() {
               </div>
             </div>
 
-            {/* Retro Details & Credits Trigger */}
-            <div className="absolute top-1 right-1 flex items-center gap-1 px-0.5 py-0.5">
+            {/* Retro Details, 3D Spectrum Toggle & Credits Trigger */}
+            <div className="absolute top-1.5 right-1.5 flex items-center gap-1.5 z-20">
+              <button 
+                onClick={() => setShowVisualizer3D(!showVisualizer3D)}
+                className={cn(
+                  "px-1 py-0.5 font-mono text-[7px] border rounded transition-all outline-none leading-none",
+                  showVisualizer3D 
+                    ? "bg-cyan-500 text-black border-cyan-300 font-bold shadow-[0_0_8px_rgba(0,240,255,0.8)]" 
+                    : "bg-black/60 text-cyan-400 border-cyan-500/50 hover:border-cyan-300"
+                )}
+                title="Toggle 3D Audio Visualizer"
+              >
+                3D
+              </button>
               <button 
                 onClick={() => setShowCredits(!showCredits)}
                 className={cn("p-0.5 text-muted-foreground transition-colors hover:text-primary outline-none", showCredits && "text-primary")}
                 title="Music Credits"
               >
-                <Info size={8} />
+                <Info size={10} />
               </button>
-              <div className={cn("w-1 h-1 rounded-full shrink-0", isPlaying ? "bg-green-500 animate-pulse outline outline-1 outline-green-500/50" : "bg-red-500 opacity-50")} />
+              <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", isPlaying ? "bg-green-500 animate-pulse outline outline-1 outline-green-500/50" : "bg-red-500 opacity-50")} />
             </div>
           </motion.div>
         </div>

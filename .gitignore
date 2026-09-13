@@ -64,3 +64,5 @@ PROJECT_STRUCTURE.md
 SUPABASE_SETUP.md
 sync_output.txt
 schema.sql
+.agents
+graphify-out

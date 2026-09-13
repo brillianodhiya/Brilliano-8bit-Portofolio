@@ -8,6 +8,7 @@ import { FloatingCoins } from "./FloatingCoins";
 import { VisitorCounter } from "./VisitorCounter";
 import { AvatarWorld } from "./AvatarWorld";
 import { AvatarSetup } from "./AvatarSetup";
+import { CrtFilterOverlay } from "./CrtFilterOverlay";
 import { useLocation } from "wouter";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -20,7 +21,8 @@ export function Layout({ children }: { children: ReactNode }) {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden flex flex-col">
+    <CrtFilterOverlay>
+      <div className="min-h-screen bg-background text-foreground relative overflow-hidden flex flex-col">
       {/* Dynamic Background Pattern */}
       <div className="absolute inset-0 z-[-1] pointer-events-none opacity-20"
            style={{
@@ -79,5 +81,6 @@ export function Layout({ children }: { children: ReactNode }) {
         </>
       )}
     </div>
+    </CrtFilterOverlay>
   );
 }

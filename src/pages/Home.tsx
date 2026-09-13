@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Download, Terminal, Gamepad2, Code2, Cpu, Loader2, Github, Linkedin } from "lucide-react";
+import { Download, Terminal, Gamepad2, Code2, Cpu, Loader2, Github, Linkedin, MapPin, Radio } from "lucide-react";
 import { CommitGraph } from "@/components/CommitGraph";
 import { useAchievements } from "@/hooks/use-achievements";
 import { useTypingEffect } from "@/hooks/use-typing-effect";
@@ -8,6 +8,7 @@ import { useProfile, usePortfolioData, calculateLevel } from "@/hooks/use-portfo
 import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
+import { CikarangRadarModal } from "@/components/CikarangRadarModal";
 
 import { useTheme } from "@/context/ThemeContext";
 import { toggleNesController } from "@/lib/nes-controller-state";
@@ -24,6 +25,28 @@ export default function Home() {
   
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
+
+  // Radar Map Modal State
+  const [isRadarOpen, setIsRadarOpen] = useState(false);
+  const [wibTime, setWibTime] = useState("");
+
+  useEffect(() => {
+    const updateWibClock = () => {
+      const now = new Date();
+      const options: Intl.DateTimeFormatOptions = {
+        timeZone: "Asia/Jakarta",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      setWibTime(new Intl.DateTimeFormat("en-GB", options).format(now));
+    };
+
+    updateWibClock();
+    const interval = setInterval(updateWibClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // RPG Dialogue Logic
   const [accepted, setAccepted] = useState(false);
@@ -352,23 +375,38 @@ export default function Home() {
         </div>
 
         {/* Mini Map / Location */}
-        <div className="pixel-panel p-6 flex flex-col md:flex-row gap-6 items-center">
-          <div className="w-full md:w-1/2 aspect-video bg-background border-4 border-white relative overflow-hidden flex items-center justify-center group cursor-crosshair">
-            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(0,212,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.2)_1px,transparent_1px)] bg-[size:20px_20px]" />
-            <div className="w-4 h-4 bg-destructive rounded-full animate-ping absolute" />
-            <span className="font-display text-[10px] text-primary z-10 bg-background/80 px-2 py-1 uppercase">LOCATION: {profile?.location || 'INDONESIA'}</span>
+        <div 
+          onClick={() => { playButtonSound(); setIsRadarOpen(true); }}
+          className="pixel-panel p-6 flex flex-col md:flex-row gap-6 items-center cursor-pointer group hover:border-emerald-400 transition-colors"
+          title="Click to open 8-Bit Cikarang Radar Map"
+        >
+          <div className="w-full md:w-1/2 aspect-video bg-stone-950 border-4 border-white relative overflow-hidden flex items-center justify-center cursor-crosshair">
+            <div className="absolute inset-0 opacity-30 bg-[linear-gradient(rgba(16,185,129,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.3)_1px,transparent_1px)] bg-[size:16px_16px]" />
+            <div className="w-6 h-6 bg-emerald-500/40 rounded-full animate-ping absolute" />
+            <div className="w-3 h-3 bg-emerald-400 rounded-full absolute shadow-[0_0_10px_rgba(16,185,129,1)]" />
+            <span className="font-display text-[9px] text-emerald-300 z-10 bg-black/80 px-2 py-1 uppercase border border-emerald-500/40 flex items-center gap-1 group-hover:scale-105 transition-transform">
+              <MapPin size={10} className="text-emerald-400 animate-bounce" /> LOCATION: CIKARANG, INDONESIA
+            </span>
           </div>
           <div className="w-full md:w-1/2">
-            <h3 className="font-display text-sm text-accent mb-4">CURRENT REGION</h3>
-            <ul className="space-y-2 font-body text-xl">
-              <li className="flex items-center gap-2"><span className="text-primary">►</span> Base: Earth</li>
-              <li className="flex items-center gap-2"><span className="text-secondary">►</span> Timezone: {profile?.timezone || 'GMT+7'}</li>
-              <li className="flex items-center gap-2"><span className="text-destructive">►</span> Weather: {profile?.weather || 'Tropical'}</li>
+            <h3 className="font-display text-xs text-emerald-400 mb-2 flex items-center justify-between">
+              <span>CURRENT REGION</span>
+              <span className="text-[8px] text-cyan-300 font-mono flex items-center gap-1 group-hover:underline">
+                RADAR <Radio size={10} className="animate-pulse" />
+              </span>
+            </h3>
+            <ul className="space-y-1.5 font-mono text-xs">
+              <li className="flex items-center gap-2"><span className="text-emerald-400">►</span> Zone: <strong className="text-white font-bold">Cikarang, Indonesia</strong></li>
+              <li className="flex items-center gap-2"><span className="text-cyan-400">►</span> Timezone: <strong className="text-cyan-300 font-bold">WIB (GMT+7)</strong></li>
+              <li className="flex items-center gap-2"><span className="text-yellow-400">►</span> Coordinates: <strong className="text-yellow-300">6.2847° S, 107.1706° E</strong></li>
             </ul>
           </div>
         </div>
 
       </div>
+
+      {/* 8-Bit Cikarang Radar Map Modal */}
+      <CikarangRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
     </motion.div>
   );
 }

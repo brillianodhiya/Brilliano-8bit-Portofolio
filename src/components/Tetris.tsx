@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
+import { unlockAchievement } from "@/hooks/use-achievements";
+import { saveArcadeScore } from "@/lib/leaderboard";
 import { playButtonSound } from "@/lib/audio";
 import { ArrowLeft, ArrowRight, ArrowDown, RotateCw, Play, Pause, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 import { setArcadeMode } from "@/lib/nes-controller-state";
@@ -93,6 +95,12 @@ export function Tetris() {
       setNextPiece(randomTetromino());
     }
   }, [nextPiece, checkCollision]);
+
+  useEffect(() => {
+    if (gameOver && score > 0) {
+      saveArcadeScore('tetris', score);
+    }
+  }, [gameOver, score]);
 
   const rotate = useCallback((dir: number) => {
     if (!activePiece || paused || gameOver) return;

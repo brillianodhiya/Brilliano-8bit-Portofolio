@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
+import { saveArcadeScore } from "@/lib/leaderboard";
 import { 
   RotateCcw, 
   Lightbulb, 
@@ -148,6 +149,13 @@ export function Sudoku() {
       }
     }
   };
+
+  useEffect(() => {
+    if (isWinner) {
+      const calculatedScore = Math.max(500, 3000 - timer * 5);
+      saveArcadeScore('sudoku', calculatedScore);
+    }
+  }, [isWinner, timer]);
 
   const useHint = () => {
     if (!selected || hints <= 0 || isWinner || isPaused) return;

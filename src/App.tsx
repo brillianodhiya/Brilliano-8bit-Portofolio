@@ -31,6 +31,7 @@ const WorkshopMermaid = lazy(() => import("@/pages/WorkshopMermaid"));
 const WorkshopBGRemover = lazy(() => import("@/pages/WorkshopBGRemover"));
 const WorkshopSprite = lazy(() => import("@/pages/WorkshopSprite"));
 const WorkshopPDF = lazy(() => import("@/pages/WorkshopPDF"));
+const WorkshopVoxel3D = lazy(() => import("@/pages/WorkshopVoxel3D"));
 const SummonUma = lazy(() => import("@/pages/SummonUma"));
 const SummonGirls = lazy(() => import("@/pages/SummonGirls"));
 const SummonBoys = lazy(() => import("@/pages/SummonBoys"));
@@ -148,6 +149,7 @@ function Router() {
           <Route path="/workshop/bg-remover" component={WorkshopBGRemover} />
           <Route path="/workshop/sprite" component={WorkshopSprite} />
           <Route path="/workshop/pdf" component={WorkshopPDF} />
+          <Route path="/workshop/voxel-3d" component={WorkshopVoxel3D} />
           
           {/* Summon Gate Routes */}
           <Route path="/summon/uma" component={SummonUma} />

@@ -15,6 +15,7 @@ import {
   Target,
   X
 } from "lucide-react";
+import { saveArcadeScore } from "@/lib/leaderboard";
 
 // --- Constants ---
 const GRID_SIZE = 20;
@@ -118,6 +119,12 @@ export function Snake() {
     }
     return () => { if (gameLoopRef.current) clearInterval(gameLoopRef.current); };
   }, [status, moveSnake, speed]);
+
+  useEffect(() => {
+    if (status === 'GAMEOVER' && score > 0) {
+      saveArcadeScore('snake', score);
+    }
+  }, [status, score]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {

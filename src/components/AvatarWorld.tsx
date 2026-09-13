@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { unlockAchievement } from "@/hooks/use-achievements";
 
@@ -67,189 +67,297 @@ const SKIN_ASSETS: Record<string, {
   rex: { emoji: '🦖', size: 'w-24 h-24', offsetY: '0px', nameOffset: '0px' },
 };
 
+// Safe walking bounds (34% to 86%) clear of MusicPlayer at bottom-left (0%-32%)
+const MIN_WALK_X = 34;
+const MAX_WALK_X = 86;
+
+interface MotionState {
+  currentX: number;
+  isMoving: boolean;
+  isFacingRight: boolean;
+  moveDuration: number;
+  isAction: boolean;
+}
+
 export function AvatarWorld() {
-  const [avatars, setAvatars] = useState<(Avatar & { prevX?: number, isFacingRight?: boolean, isAction?: boolean })[]>([]);
-  const [localX, setLocalX] = useState<number | null>(null);
-  const [localFacingRight, setLocalFacingRight] = useState(true);
-  const [localAction, setLocalAction] = useState(false);
-  const [isMoving, setIsMoving] = useState(false);
-  const [myId, setMyId] = useState(() => localStorage.getItem("portfolio_avatar_id"));
+  const [avatars, setAvatars] = useState<Avatar[]>([]);
+  const [motionStates, setMotionStates] = useState<Record<string, MotionState>>({});
+  const [, setMyId] = useState<string | null>(() => localStorage.getItem("portfolio_avatar_id"));
+  const activeTimeoutsRef = useRef<Record<string, NodeJS.Timeout[]>>({});
 
   const fetchAvatars = async () => {
     if (!supabase) return;
-    const { data } = await supabase
-      .from('portfolio_avatars')
-      .select('*')
-      .eq('is_online', true)
-      .order('updated_at', { ascending: false })
-      .limit(20);
-    
-    if (data) setAvatars(data);
+    try {
+      const { data } = await supabase
+        .from('portfolio_avatars')
+        .select('*')
+        .eq('is_online', true)
+        .order('updated_at', { ascending: false })
+        .limit(20);
+      
+      if (data && data.length > 0) {
+        setAvatars(data);
+      }
+    } catch (err) {
+      console.warn("Could not fetch remote avatars:", err);
+    }
   };
 
-  // Watch for local updates via custom event
   useEffect(() => {
-    // Check for existing avatar to unlock achievement
-    const existingId = localStorage.getItem("portfolio_avatar_id");
-    if (existingId) {
+    const savedId = localStorage.getItem("portfolio_avatar_id");
+    setMyId(savedId);
+    if (savedId) {
       unlockAchievement("legendary_hero");
     }
 
     const handleUpdate = () => {
-      const newMyId = localStorage.getItem("portfolio_avatar_id");
-      if (newMyId) {
+      const newSavedId = localStorage.getItem("portfolio_avatar_id");
+      setMyId(newSavedId);
+      if (newSavedId) {
         unlockAchievement("legendary_hero");
       }
-      setMyId(newMyId);
       fetchAvatars();
     };
 
     window.addEventListener('portfolio_avatar_updated', handleUpdate);
     fetchAvatars();
     
-    if (!supabase) return;
+    if (supabase) {
+      const channel = supabase
+        .channel('avatar_changes')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'portfolio_avatars' }, 
+          () => fetchAvatars()
+        )
+        .subscribe();
 
-    const channel = supabase
-      .channel('avatar_changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'portfolio_avatars' }, 
-        (payload) => {
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            const updated = payload.new as Avatar;
-            setAvatars(prev => {
-              const existing = prev.find(a => a.id === updated.id);
-              
-              // Only update prevX if position actually changed
-              // This prevents idle animation during heartbeats while still sliding
-              const hasMoved = existing && existing.x_pos !== updated.x_pos;
-              const prevX = hasMoved ? existing.x_pos : (existing?.prevX ?? updated.x_pos);
-              
-              const withMeta = { 
-                ...updated, 
-                prevX: prevX,
-                isFacingRight: updated.is_facing_right ?? existing?.is_facing_right ?? true
-              };
-              if (existing) return prev.map(a => a.id === updated.id ? withMeta : a);
-              return [...prev, withMeta];
-            });
-          } else if (payload.eventType === 'DELETE') {
-            setAvatars(prev => prev.filter(a => a.id !== (payload.old as Avatar).id));
-          } else {
-            fetchAvatars();
-          }
-        }
-      )
-      .subscribe();
-
-    // Random Wander Logic for local player
-    const wander = async () => {
-      if (!myId || !supabase) return;
-      
-      const newX = Math.floor(Math.random() * 80) + 10;
-      const fRight = newX > (localX ?? 50);
-      setLocalFacingRight(fRight);
-      
-      // Sync direction change immediately before movement
-      if (supabase) {
-        await supabase
-          .from('portfolio_avatars')
-          .update({ is_facing_right: fRight, updated_at: new Date().toISOString() })
-          .eq('id', myId);
-      }
-
-      // Small delay before moving to ensure flip happens first visually
-      setTimeout(async () => {
-        setLocalX(newX);
-        setIsMoving(true);
-
-        if (supabase) {
-          await supabase
-            .from('portfolio_avatars')
-            .update({ 
-              x_pos: newX, 
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', myId);
-        }
-      }, 100);
-        
-      // Stop moving after transition duration (approx 7.5s)
-      setTimeout(() => setIsMoving(false), 7500);
-      
-      // Random action chance while idle
-      const scheduleAction = () => {
-        const skin = localStorage.getItem("portfolio_avatar_skin");
-        if (skin && SKIN_ASSETS[skin]?.random && Math.random() > 0.5) {
-          setLocalAction(true);
-          setTimeout(() => setLocalAction(false), 3000); // Actions usually last ~3s
-        }
+      return () => {
+        supabase.removeChannel(channel);
+        window.removeEventListener('portfolio_avatar_updated', handleUpdate);
       };
-      
-      const actionDelay = 1000 + Math.random() * 5000;
-      setTimeout(scheduleAction, actionDelay);
-      
-      // Schedule next walk with random delay (15-40s) for a more realistic feel
-      setTimeout(wander, 15000 + Math.random() * 25000);
-    };
-
-    const timeoutIdx = setTimeout(wander, 3000);
+    }
 
     return () => {
-      if (supabase && channel) {
-        supabase.removeChannel(channel);
-      }
       window.removeEventListener('portfolio_avatar_updated', handleUpdate);
-      clearTimeout(timeoutIdx);
     };
-  }, [myId]);
+  }, []);
+
+  // Combine remote DB avatars with saved local avatar (NO fake HERO fallback)
+  const savedId = localStorage.getItem("portfolio_avatar_id");
+  const localSkin = localStorage.getItem("portfolio_avatar_skin");
+  const localName = localStorage.getItem("portfolio_avatar_name");
+
+  const displayAvatars = [...avatars];
+  
+  if (savedId && localSkin && localName) {
+    const existingIndex = displayAvatars.findIndex(a => a.id === savedId);
+    if (existingIndex === -1) {
+      displayAvatars.unshift({
+        id: savedId,
+        name: localName,
+        skin: localSkin,
+        x_pos: 50,
+        is_online: true,
+        is_facing_right: true,
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // Reactive motion engine with synchronized GIF state & position slide
+  useEffect(() => {
+    if (displayAvatars.length === 0) return;
+
+    // Initialize motion state for any avatar starting at its DB x_pos (clamped)
+    setMotionStates(prev => {
+      const next = { ...prev };
+      let updated = false;
+
+      displayAvatars.forEach(avatar => {
+        if (!next[avatar.id]) {
+          updated = true;
+          const initialX = Math.max(MIN_WALK_X, Math.min(MAX_WALK_X, avatar.x_pos || 50));
+          next[avatar.id] = {
+            currentX: initialX,
+            isMoving: false,
+            isFacingRight: avatar.is_facing_right ?? true,
+            moveDuration: 4000,
+            isAction: false,
+          };
+        }
+      });
+
+      return updated ? next : prev;
+    });
+
+    // Wandering loop running every 3.5s
+    const timer = setInterval(() => {
+      displayAvatars.forEach(avatar => {
+        setMotionStates(prev => {
+          const state = prev[avatar.id];
+          if (!state || state.isMoving) return prev; // Skip if currently walking
+
+          // 75% chance to wander to new target
+          if (Math.random() < 0.75) {
+            const currentX = state.currentX;
+            const targetX = Math.floor(Math.random() * (MAX_WALK_X - MIN_WALK_X)) + MIN_WALK_X;
+            const distance = Math.abs(targetX - currentX);
+
+            if (distance < 6) return prev;
+
+            const fRight = targetX > currentX;
+            const duration = Math.max(3200, Math.min(7500, distance * 110));
+
+            // Step 1: Immediately switch sprite to WALK GIF & flip facing direction
+            const startState: MotionState = {
+              ...state,
+              isMoving: true,
+              isFacingRight: fRight,
+              moveDuration: duration,
+              isAction: false,
+            };
+
+            // Step 2: Short 60ms delay before sliding left position (ensures GIF changes FIRST before sliding)
+            const t1 = setTimeout(() => {
+              setMotionStates(latest => {
+                if (!latest[avatar.id]) return latest;
+                return {
+                  ...latest,
+                  [avatar.id]: {
+                    ...latest[avatar.id],
+                    currentX: targetX,
+                  }
+                };
+              });
+
+              // Sync to DB if this is user's saved avatar
+              if (avatar.id === savedId && supabase) {
+                supabase
+                  .from('portfolio_avatars')
+                  .update({ 
+                    x_pos: targetX, 
+                    is_facing_right: fRight, 
+                    updated_at: new Date().toISOString() 
+                  })
+                  .eq('id', savedId)
+                  .then();
+              }
+            }, 60);
+
+            // Step 3: Only switch BACK to idle AFTER position slide has 100% completed (duration + 150ms)
+            const t2 = setTimeout(() => {
+              setMotionStates(latest => {
+                if (!latest[avatar.id]) return latest;
+                return {
+                  ...latest,
+                  [avatar.id]: {
+                    ...latest[avatar.id],
+                    isMoving: false,
+                  }
+                };
+              });
+
+              // Random action gesture when standing idle
+              if (SKIN_ASSETS[avatar.skin]?.random && Math.random() > 0.4) {
+                setMotionStates(latest => {
+                  if (!latest[avatar.id]) return latest;
+                  return {
+                    ...latest,
+                    [avatar.id]: {
+                      ...latest[avatar.id],
+                      isAction: true,
+                    }
+                  };
+                });
+                const t3 = setTimeout(() => {
+                  setMotionStates(latest => {
+                    if (!latest[avatar.id]) return latest;
+                    return {
+                      ...latest,
+                      [avatar.id]: {
+                        ...latest[avatar.id],
+                        isAction: false,
+                      }
+                    };
+                  });
+                }, 2500);
+                
+                if (!activeTimeoutsRef.current[avatar.id]) activeTimeoutsRef.current[avatar.id] = [];
+                activeTimeoutsRef.current[avatar.id].push(t3);
+              }
+            }, duration + 150);
+
+            if (!activeTimeoutsRef.current[avatar.id]) activeTimeoutsRef.current[avatar.id] = [];
+            activeTimeoutsRef.current[avatar.id].push(t1, t2);
+
+            return {
+              ...prev,
+              [avatar.id]: startState,
+            };
+          }
+
+          return prev;
+        });
+      });
+    }, 3500);
+
+    return () => {
+      clearInterval(timer);
+      Object.values(activeTimeoutsRef.current).flatMap(ts => ts).forEach(clearTimeout);
+    };
+  }, [displayAvatars.map(a => a.id).join(",")]);
+
+  // If no saved avatar and no remote avatars, display nothing (do NOT render fake HERO)
+  if (displayAvatars.length === 0) return null;
 
   return (
     <div className="fixed bottom-[4px] inset-x-0 h-0 z-30 pointer-events-none">
-      {avatars.map((avatar) => {
-        const isMe = avatar.id === myId;
-        const currentX = isMe && localX !== null ? localX : avatar.x_pos;
-        
-        // Use timestamp to determine if character is currently in its 8s walking transition
-        // Increased to 8s to ensure animation doesn't stop too early
-        const timeSinceUpdate = Date.now() - new Date(avatar.updated_at).getTime();
-        const moving = isMe ? isMoving : (timeSinceUpdate < 7500); 
-        
-        const assets = SKIN_ASSETS[avatar.skin] || { emoji: '👤' };
-        
-        // Random action logic for others
-        const isAction = isMe ? localAction : (avatar.isAction || (Math.random() < 0.005 && !moving));
-        
-        // Face direction logic
-        const facingRight = isMe ? localFacingRight : (avatar.is_facing_right ?? true);
+      {displayAvatars.map((avatar) => {
+        const isMe = avatar.id === savedId;
+        const state = motionStates[avatar.id] || {
+          currentX: Math.max(MIN_WALK_X, Math.min(MAX_WALK_X, avatar.x_pos || 50)),
+          isMoving: false,
+          isFacingRight: true,
+          moveDuration: 4000,
+          isAction: false,
+        };
+
+        const assets = SKIN_ASSETS[avatar.skin] || SKIN_ASSETS.cat;
         const baseFacing = assets.baseFacing || 'right';
-        const shouldFlip = (baseFacing === 'right' && !facingRight) || (baseFacing === 'left' && facingRight);
+        const shouldFlip = (baseFacing === 'right' && !state.isFacingRight) || (baseFacing === 'left' && state.isFacingRight);
+
+        // Synchronized asset selection: ALWAYS use walk GIF while isMoving is true
+        const currentAsset = state.isMoving 
+          ? (assets.walk || assets.idle) 
+          : (state.isAction && assets.random ? assets.random : (assets.idle || assets.walk));
 
         return (
           <div
             key={avatar.id}
-            className="absolute transition-all duration-[7500ms] ease-linear"
+            className="absolute"
             style={{
-              left: `${currentX}%`,
+              left: `${state.currentX}%`,
               bottom: assets.offsetY || '0px',
               transform: 'translateX(-50%)',
+              transition: state.isMoving ? `left ${state.moveDuration}ms linear` : 'none',
             }}
           >
             <div className="flex flex-col items-center">
               <div 
-                className="bg-black/60 px-2 py-0.5 rounded border border-white/20 mb-1 backdrop-blur-[1px]"
+                className="bg-black/80 px-2 py-0.5 rounded border border-white/30 mb-1 backdrop-blur-[2px] shadow-md"
                 style={{ transform: `translateY(${assets.nameOffset || '0px'})` }}
               >
                 <span className="text-[6px] text-white font-display uppercase tracking-widest whitespace-nowrap">
-                  {avatar.name || "UNNAMED"}
+                  {avatar.name || "PLAYER"}
                 </span>
               </div>
-              {assets.idle || assets.walk ? (
+              {currentAsset ? (
                 <img 
-                  src={`${import.meta.env.BASE_URL}${(moving ? (assets.walk || assets.idle) : (isAction && assets.random ? assets.random : (assets.idle || assets.walk)))!.slice(1)}`} 
+                  src={`${import.meta.env.BASE_URL}${currentAsset.slice(1)}`} 
                   className={`${assets.size} object-contain pixelated`}
                   style={{ 
                     transform: shouldFlip ? 'scaleX(-1)' : 'scaleX(1)',
-                    filter: isMe ? 'drop-shadow(0 0 8px rgba(0,212,255,0.6))' : 'none',
+                    filter: isMe ? 'drop-shadow(0 0 8px rgba(0,212,255,0.85))' : 'none',
                     imageRendering: 'pixelated'
                   }}
                   alt={avatar.skin}

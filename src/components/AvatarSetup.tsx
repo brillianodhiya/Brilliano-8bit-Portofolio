@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useScore } from "@/hooks/use-score";
 import { supabase } from "@/lib/supabaseClient";
 import { playButtonSound } from "@/lib/audio";
+import { AvatarDiorama3D } from "@/components/3d/AvatarDiorama3D";
 
 const UNLOCK_SCORE = 10000;
 const SKINS = [
@@ -151,6 +152,10 @@ export function AvatarSetup() {
             >
               <h2 className="text-xl mb-4 text-primary text-shadow-pixel">CHARACTER SETUP</h2>
               
+              <div className="mb-4">
+                <AvatarDiorama3D skin={selectedSkin} name={name || "HERO"} className="w-full h-44" />
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs mb-2 text-muted-foreground uppercase">Hero Name</label>
