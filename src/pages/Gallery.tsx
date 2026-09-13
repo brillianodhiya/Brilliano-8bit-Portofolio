@@ -178,8 +178,8 @@ export default function Gallery() {
           <RetroTv3D
             channelName={currentTvItem.title}
             channelUrl={currentTvItem.youtube_id ? `https://www.youtube.com/watch?v=${currentTvItem.youtube_id}` : ""}
-            imageUrl={currentTvItem.url}
-            channelDesc={`FEED ID: #${currentTvItem.id} • ${currentTvItem.youtube_id ? "VIDEO BROADCAST" : "STATIC CAPTURE"}`}
+            imageUrl={currentTvItem.youtube_id ? undefined : currentTvItem.url}
+            channelDesc={`FEED ID: #${String(currentTvItem.id).slice(0, 8).toUpperCase()} • ${currentTvItem.youtube_id ? "VIDEO BROADCAST" : "STATIC CAPTURE"}`}
             channelNumber={(tvChannelIndex % filteredItems.length) + 1}
             onNextChannel={handleNextTvChannel}
             onPrevChannel={handlePrevTvChannel}

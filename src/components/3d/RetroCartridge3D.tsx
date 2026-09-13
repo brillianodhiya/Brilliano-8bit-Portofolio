@@ -435,11 +435,15 @@ export function RetroCartridge3D({
               </div>
 
               <button
-                onClick={() => setIsLightboxOpen(false)}
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-red-600 text-white border border-white/30 flex items-center justify-center transition-colors cursor-pointer shadow-lg active:scale-90"
+                onClick={() => {
+                  playButtonSound();
+                  setIsLightboxOpen(false);
+                }}
+                className="pixel-btn px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-display text-xs flex items-center gap-1.5 border-2 border-white shadow-[3px_3px_0px_#000] cursor-pointer transition-transform active:translate-y-0.5"
                 title="Close Enlarged View"
               >
-                <X size={22} />
+                <X size={16} strokeWidth={3} />
+                <span>ESC</span>
               </button>
             </div>
 

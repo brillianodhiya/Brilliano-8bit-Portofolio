@@ -180,10 +180,10 @@ export function RetroTv3D({
         </div>
 
         {/* Top TV Status Bar & Info Header */}
-        <div className="w-full flex items-center justify-between mb-3 px-2 z-10 [transform-style:preserve-3d]" style={{ transform: "translateZ(20px)" }}>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_12px_rgba(255,0,0,0.9)] border border-red-300" />
-            <span className="font-mono text-[10px] sm:text-xs text-red-300 font-bold uppercase tracking-widest truncate max-w-[220px] sm:max-w-none text-shadow-pixel">
+        <div className="w-full flex items-center justify-between mb-3 px-2 z-10 min-w-0 [transform-style:preserve-3d]" style={{ transform: "translateZ(20px)" }}>
+          <div className="flex items-center gap-2 min-w-0 flex-1 mr-2 overflow-hidden">
+            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_12px_rgba(255,0,0,0.9)] border border-red-300 shrink-0" />
+            <span className="font-mono text-[10px] sm:text-xs text-red-300 font-bold uppercase tracking-widest truncate block min-w-0 flex-1 text-shadow-pixel">
               BROADCAST // CH-{String(channelNumber).padStart(2, "0")}: {channelName}
             </span>
           </div>
@@ -249,13 +249,13 @@ export function RetroTv3D({
 
         {/* Lower Control Panel: 3D Knobs, Grille & Info Bar */}
         <div 
-          className="w-full flex flex-col sm:flex-row items-center justify-between mt-3 px-3 pt-2.5 border-t-2 border-amber-900/80 gap-3 z-10"
+          className="w-full flex flex-col sm:flex-row items-center justify-between mt-3 px-3 pt-2.5 border-t-2 border-amber-900/80 gap-3 z-10 min-w-0"
           style={{ transform: "translateZ(20px)" }}
         >
           {/* Channel Description */}
-          <div className="flex items-center gap-2 text-amber-200">
-            <span className="text-sm">📡</span>
-            <span className="font-mono text-[10px] sm:text-xs text-amber-200/90 truncate max-w-[280px]">
+          <div className="flex items-center gap-2 text-amber-200 min-w-0 flex-1 overflow-hidden mr-2">
+            <span className="text-sm shrink-0">📡</span>
+            <span className="font-mono text-[10px] sm:text-xs text-amber-200/90 truncate block min-w-0 flex-1">
               {channelDesc}
             </span>
           </div>
