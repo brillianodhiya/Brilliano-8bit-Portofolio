@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { ExternalLink } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { playButtonSound } from "@/lib/audio";
 
 interface RetroTv3DProps {
@@ -7,6 +7,9 @@ interface RetroTv3DProps {
   channelUrl: string;
   channelDesc: string;
   channelNumber: number;
+  imageUrl?: string;
+  onNextChannel?: () => void;
+  onPrevChannel?: () => void;
 }
 
 export function RetroTv3D({
@@ -14,6 +17,9 @@ export function RetroTv3D({
   channelUrl,
   channelDesc,
   channelNumber,
+  imageUrl,
+  onNextChannel,
+  onPrevChannel,
 }: RetroTv3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState<string>("rotateX(0deg) rotateY(0deg)");
@@ -44,9 +50,14 @@ export function RetroTv3D({
     setTransform("rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)");
   };
 
-  const handleKnobClick = () => {
-    setKnobRotation((prev) => prev + 45);
+  const handleKnobClick = (isNext = true) => {
+    setKnobRotation((prev) => prev + (isNext ? 45 : -45));
     playButtonSound();
+    if (isNext && onNextChannel) {
+      onNextChannel();
+    } else if (!isNext && onPrevChannel) {
+      onPrevChannel();
+    }
   };
 
   const getEmbedUrl = (url: string) => {
@@ -70,6 +81,25 @@ export function RetroTv3D({
   };
 
   const embedUrl = getEmbedUrl(channelUrl);
+  const isImage = !!imageUrl;
+
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [imageUrl]);
+
+  const resolveImageUrl = (url?: string) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+      return url;
+    }
+    const cleanPath = url.startsWith("/") ? url.slice(1) : url;
+    if (cleanPath.startsWith("images/")) {
+      return `${import.meta.env.BASE_URL}${cleanPath}`;
+    }
+    return `${import.meta.env.BASE_URL}images/${cleanPath}`;
+  };
 
   return (
     <div
@@ -95,18 +125,13 @@ export function RetroTv3D({
             : "0 25px 50px -10px rgba(0,0,0,0.95)",
         }}
       >
-        {/* ============================================================ */}
-        {/* REAR CRT TUBE SHELL (TABUNG BELAKANG 3D) & EXTENDED DEPTH     */}
-        {/* ============================================================ */}
-        
-        {/* 1. Deep Rear CRT Tube Hump (Tabung Belakang Extrusion) */}
+        {/* REAR CRT TUBE SHELL */}
         <div
           className="absolute inset-x-16 top-8 bottom-8 bg-gradient-to-b from-neutral-900 via-stone-900 to-black rounded-3xl border-4 border-stone-800 flex flex-col items-center justify-between p-4 shadow-2xl pointer-events-none"
           style={{ transform: "translateZ(-80px)", transformOrigin: "center" }}
         >
           {/* Back Air Vents / Heat Grill */}
           <div className="w-full flex flex-col gap-1.5 opacity-60">
-            <div className="h-1.5 w-full bg-black rounded-full border-b border-stone-700" />
             <div className="h-1.5 w-full bg-black rounded-full border-b border-stone-700" />
             <div className="h-1.5 w-full bg-black rounded-full border-b border-stone-700" />
             <div className="h-1.5 w-full bg-black rounded-full border-b border-stone-700" />
@@ -127,33 +152,23 @@ export function RetroTv3D({
           </div>
         </div>
 
-        {/* 2. Top Tapered Roof Connecting Front Cabinet to Rear CRT Shell */}
+        {/* Tapered Side Walls */}
         <div
           className="absolute top-0 inset-x-4 h-20 bg-gradient-to-b from-amber-900 to-stone-900 rounded-t-2xl border-t-2 border-x-2 border-amber-700/60 pointer-events-none"
           style={{ transform: "translateZ(-40px) rotateX(-75deg)", transformOrigin: "top" }}
         />
-
-        {/* 3. Bottom Base Plate Under Rear CRT Shell */}
         <div
           className="absolute bottom-0 inset-x-4 h-20 bg-stone-950 rounded-b-2xl border-b-2 border-x-2 border-stone-800 pointer-events-none"
           style={{ transform: "translateZ(-40px) rotateX(75deg)", transformOrigin: "bottom" }}
         />
-
-        {/* 4. Left Tapered Side Wall Connecting Front to Rear CRT Shell */}
         <div
           className="absolute top-4 bottom-4 left-0 w-20 bg-gradient-to-r from-amber-950 to-stone-900 rounded-l-2xl border-l-2 border-y-2 border-amber-800 pointer-events-none opacity-95"
           style={{ transform: "translateZ(-40px) rotateY(-75deg)", transformOrigin: "left" }}
         />
-
-        {/* 5. Right Tapered Side Wall Connecting Front to Rear CRT Shell */}
         <div
           className="absolute top-4 bottom-4 right-0 w-20 bg-gradient-to-l from-amber-950 to-stone-900 rounded-r-2xl border-r-2 border-y-2 border-amber-800 pointer-events-none opacity-95"
           style={{ transform: "translateZ(-40px) rotateY(75deg)", transformOrigin: "right" }}
         />
-
-        {/* ============================================================ */}
-        {/* FRONT CABINET FACING & SCREEN ASSEMBLY                       */}
-        {/* ============================================================ */}
 
         {/* 3D Antennas */}
         <div 
@@ -173,15 +188,17 @@ export function RetroTv3D({
             </span>
           </div>
 
-          <a
-            href={channelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={playButtonSound}
-            className="pixel-btn px-2.5 py-1 text-[9px] bg-red-600 hover:bg-red-500 text-white flex items-center gap-1.5 shrink-0 shadow-md transition-transform hover:scale-105"
-          >
-            OPEN YOUTUBE <ExternalLink size={10} />
-          </a>
+          {channelUrl && !isImage && (
+            <a
+              href={channelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={playButtonSound}
+              className="pixel-btn px-2.5 py-1 text-[9px] bg-red-600 hover:bg-red-500 text-white flex items-center gap-1.5 shrink-0 shadow-md transition-transform hover:scale-105"
+            >
+              OPEN SOURCE <ExternalLink size={10} />
+            </a>
+          )}
         </div>
 
         {/* Main CRT Screen Outer Bezel Frame */}
@@ -189,21 +206,43 @@ export function RetroTv3D({
           className="relative w-full aspect-video bg-stone-900 rounded-2xl p-2 sm:p-3 border-4 border-amber-950 shadow-[inset_0_5px_20px_rgba(0,0,0,0.95)] flex items-center justify-center overflow-hidden"
           style={{ transform: "translateZ(15px)" }}
         >
-          {/* CRT Screen Display Container with Curved Bezel */}
+          {/* CRT Screen Display Container */}
           <div className="relative w-full h-full rounded-xl bg-black border-4 border-slate-950 overflow-hidden shadow-2xl flex items-center justify-center">
-            <iframe
-              key={channelUrl}
-              src={embedUrl}
-              title={channelName}
-              className="w-full h-full border-0 relative z-10"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+            {isImage ? (
+              !imgError ? (
+                <img
+                  key={imageUrl}
+                  src={resolveImageUrl(imageUrl)}
+                  alt={channelName}
+                  onError={() => setImgError(true)}
+                  className="w-full h-full object-cover relative z-10"
+                />
+              ) : (
+                <div className="w-full h-full bg-zinc-950 flex flex-col items-center justify-center relative z-10 text-center p-4">
+                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:8px_8px] animate-pulse" />
+                  <div className="font-display text-red-500 text-xs sm:text-sm mb-2 animate-bounce">⚡ NO SIGNAL // 404</div>
+                  <div className="font-mono text-[10px] text-zinc-300 max-w-[240px] truncate">
+                    {channelName}
+                  </div>
+                  <div className="font-mono text-[9px] text-zinc-500 mt-1">
+                    MEDIA FILE UNREACHABLE
+                  </div>
+                </div>
+              )
+            ) : (
+              <iframe
+                key={channelUrl}
+                src={embedUrl}
+                title={channelName}
+                className="w-full h-full border-0 relative z-10"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
 
             {/* CRT Glass Lens Effect & Reflection Overlay */}
             <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] opacity-75" />
             <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_center,transparent_55%,rgba(0,0,0,0.85)_100%)]" />
-            {/* Glass Glare Highlight */}
             <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 opacity-60" />
           </div>
         </div>
@@ -221,21 +260,35 @@ export function RetroTv3D({
             </span>
           </div>
 
-          {/* Right Side Control Knobs & Speaker Grille */}
+          {/* Right Side Control Knobs & Channel Buttons */}
           <div className="flex items-center gap-4 shrink-0">
-            {/* Speaker Grille Lines */}
-            <div className="flex gap-1 items-center opacity-70">
-              <div className="w-1 h-5 bg-amber-950 rounded border-r border-amber-800" />
-              <div className="w-1 h-5 bg-amber-950 rounded border-r border-amber-800" />
-              <div className="w-1 h-5 bg-amber-950 rounded border-r border-amber-800" />
-              <div className="w-1 h-5 bg-amber-950 rounded border-r border-amber-800" />
-            </div>
+            {/* Channel Surf Prev/Next Buttons */}
+            {onNextChannel && onPrevChannel && (
+              <div className="flex items-center gap-2 px-1">
+                <button
+                  type="button"
+                  onClick={() => handleKnobClick(false)}
+                  className="pixel-btn w-8 h-8 flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-black border-2 border-white font-bold shadow-[2px_2px_0px_#000] cursor-pointer transition-transform active:translate-y-0.5"
+                  title="Previous Channel"
+                >
+                  <ChevronLeft size={16} strokeWidth={3} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleKnobClick(true)}
+                  className="pixel-btn w-8 h-8 flex items-center justify-center bg-cyan-400 hover:bg-cyan-300 text-black border-2 border-white font-bold shadow-[2px_2px_0px_#000] cursor-pointer transition-transform active:translate-y-0.5"
+                  title="Next Channel"
+                >
+                  <ChevronRight size={16} strokeWidth={3} />
+                </button>
+              </div>
+            )}
 
             {/* Rotatable 3D Dial Knobs */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleKnobClick}
+                onClick={() => handleKnobClick(true)}
                 title="Click to turn Volume Knob"
                 className="flex flex-col items-center group/knob cursor-pointer"
               >
@@ -250,7 +303,7 @@ export function RetroTv3D({
 
               <button
                 type="button"
-                onClick={handleKnobClick}
+                onClick={() => handleKnobClick(true)}
                 title="Click to turn Channel Knob"
                 className="flex flex-col items-center group/knob cursor-pointer"
               >
