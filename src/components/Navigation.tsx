@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { RetroHandheldCvModal } from "./RetroHandheldCvModal";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { useProfile, calculateLevel } from "@/hooks/use-portfolio-data";
@@ -22,6 +24,7 @@ export function Navigation() {
   const { isKanrishaurus } = useTheme();
   const [location] = useLocation();
   const { data: profile } = useProfile();
+  const [isCvOpen, setIsCvOpen] = useState(false);
   
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
@@ -51,6 +54,16 @@ export function Navigation() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           <button
+            onClick={() => {
+              playButtonSound();
+              setIsCvOpen(true);
+            }}
+            className="pixel-btn px-2 py-1 bg-red-600/30 hover:bg-red-600/50 border-red-400 text-red-200 text-[9px] sm:text-[10px] font-mono uppercase flex items-center gap-1 cursor-pointer"
+            title="Inspect Handheld GameBoy CV"
+          >
+            <span>📱 CV</span>
+          </button>
+          <button
             onClick={() => { playButtonSound(); toggleCrtFilter(); }}
             className="pixel-btn px-2 py-1 bg-amber-500/20 hover:bg-amber-500/40 border-amber-500 text-amber-300 text-[9px] sm:text-[10px] font-mono uppercase flex items-center gap-1"
             title="Toggle CRT TV Screen Overlay"
@@ -60,6 +73,11 @@ export function Navigation() {
           <ThemeToggle />
         </div>
       </div>
+
+      {/* 8-Bit Handheld GameBoy Console CV Modal */}
+      {isCvOpen && (
+        <RetroHandheldCvModal onClose={() => setIsCvOpen(false)} />
+      )}
 
       {/* Main Nav Menu */}
       <nav className="flex justify-center -mt-1 relative z-10">

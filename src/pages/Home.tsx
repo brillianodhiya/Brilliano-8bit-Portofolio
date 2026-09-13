@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { playButtonSound } from "@/lib/audio";
 import { SEO } from "@/components/SEO";
 import { CikarangRadarModal } from "@/components/CikarangRadarModal";
+import { RetroHandheldCvModal } from "@/components/RetroHandheldCvModal";
 
 import { useTheme } from "@/context/ThemeContext";
 import { toggleNesController } from "@/lib/nes-controller-state";
@@ -26,8 +27,9 @@ export default function Home() {
   const birthDate = profile?.birth_date || '2000-08-24';
   const { level, exp } = calculateLevel(birthDate);
 
-  // Radar Map Modal State
+  // Radar Map & CV Modal State
   const [isRadarOpen, setIsRadarOpen] = useState(false);
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
   const [wibTime, setWibTime] = useState("");
 
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function Home() {
   const handleDownload = () => {
     playButtonSound();
     unlockAchievement("cv_download");
-    window.open("https://drive.google.com/file/d/1bXnsBuyn_voV-xzwK4ts-9uA89QFzFF2/view?usp=sharing", "_blank");
+    setIsCvModalOpen(true);
   };
 
   const playSound = (type: 'coin' | 'playful' | 'boss') => {
@@ -407,6 +409,11 @@ export default function Home() {
 
       {/* 8-Bit Cikarang Radar Map Modal */}
       <CikarangRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
+
+      {/* 8-Bit Handheld GameBoy Console CV Modal */}
+      {isCvModalOpen && (
+        <RetroHandheldCvModal onClose={() => setIsCvModalOpen(false)} />
+      )}
     </motion.div>
   );
 }
